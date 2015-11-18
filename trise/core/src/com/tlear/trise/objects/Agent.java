@@ -4,6 +4,9 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import com.tlear.trise.environment.Environment;
+import com.tlear.trise.functions.DecisionFunction;
+import com.tlear.trise.functions.GoalFunction;
+import com.tlear.trise.functions.ResultFunction;
 
 public class Agent extends DynamicObject {
 	
