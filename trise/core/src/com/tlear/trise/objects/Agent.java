@@ -1,9 +1,15 @@
 package com.tlear.trise.objects;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
 import com.tlear.trise.environment.Environment;
+import com.tlear.trise.functions.DecisionFunction;
+import com.tlear.trise.functions.GoalFunction;
+import com.tlear.trise.functions.ResultFunction;
+import com.tlear.trise.interactions.Actuator;
+import com.tlear.trise.interactions.Sensor;
 
 public class Agent extends DynamicObject {
 	
@@ -28,6 +34,15 @@ public class Agent extends DynamicObject {
 		actualKeyframes = new LinkedList<Agent>();
 		beliefKeyframes.add(this);
 		actualKeyframes.add(this);
+		
+		sensors = new HashSet<Sensor>();
+		actuators = new HashSet<Actuator>();
+		
+		result = new ResultFunction();
+		goal = new GoalFunction();
+		decide = new DecisionFunction();
+		
+		belief = new Environment();
 	}
 
 }
