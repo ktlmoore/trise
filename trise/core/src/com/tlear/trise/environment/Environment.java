@@ -5,9 +5,12 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.tlear.trise.graph.Graph;
 import com.tlear.trise.objects.Agent;
 import com.tlear.trise.objects.StaticGoal;
 import com.tlear.trise.objects.StaticObstacle;
+import com.tlear.trise.utils.Triple;
 import com.tlear.trise.utils.Tuple;
 
 public class Environment {
@@ -64,18 +67,18 @@ public class Environment {
 	 * Generates the next keyframe
 	 * @param timeMap
 	 */
-	public Tuple<Integer, Integer> getNextKeyframe(Map<Integer, Integer> timeMap) {
+	public Triple<Integer, Integer, Graph<Vector2>> getNextKeyframe(Map<Integer, Integer> timeMap) {
 		
 //		System.out.println("GETTING NEXT KEYFRAME");
 		/*
 		 * we'll probably want to check that we are actually at the latest keyframe
 		 */
 		
-		Tuple<Environment, Tuple<Integer, Integer>> nextKeyframe = agents.getFirst().process(this, timeMap);
+		Triple<Environment, Tuple<Integer, Integer>, Graph<Vector2>> nextKeyframe = agents.getFirst().process(this, timeMap);
 //		System.out.println("NEXT KEYFRAME: " + nextKeyframe);
 		Tuple<Integer, Integer> mapEntry = nextKeyframe.snd;
 		
-		return mapEntry;
+		return new Triple<Integer, Integer, Graph<Vector2>>(mapEntry.fst, mapEntry.snd, nextKeyframe.thd);
 	}
 	
 	public void update(Map<Integer, Integer> timeMap, int prevKeyframe, int time, int nextKeyframe) {

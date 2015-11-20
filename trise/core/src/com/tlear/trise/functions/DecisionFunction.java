@@ -4,15 +4,18 @@ import java.util.function.Function;
 
 import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
+import com.tlear.trise.functions.skeletonisation.ProbabilisticRoadMap;
+import com.tlear.trise.graph.Graph;
 import com.tlear.trise.interactions.Action;
 import com.tlear.trise.interactions.MoveToAction;
+import com.tlear.trise.utils.Tuple;
 
-public class DecisionFunction implements Function<Environment, Action> {
+public class DecisionFunction implements Function<Environment, Tuple<Action, Graph<Vector2>>> {
 	
 	private int i = 0;
 
 	@Override
-	public Action apply(Environment t) {
+	public Tuple<Action, Graph<Vector2>> apply(Environment t) {
 		/*
 		 * TODO FIXME
 		 */
@@ -54,7 +57,10 @@ public class DecisionFunction implements Function<Environment, Action> {
 		}
 		i++;
 		
-		return new MoveToAction(p, q);
+		ProbabilisticRoadMap probabilisticRoadMap = new ProbabilisticRoadMap(10, 3);
+		Graph<Vector2> prm = probabilisticRoadMap.skeletonise(t);
+		
+		return new Tuple<>(new MoveToAction(p, q), prm);
 	}
 	
 }

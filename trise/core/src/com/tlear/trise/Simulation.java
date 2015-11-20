@@ -4,8 +4,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
+import com.tlear.trise.graph.Edge;
+import com.tlear.trise.graph.Graph;
+import com.tlear.trise.graph.Node;
 import com.tlear.trise.objects.Agent;
+import com.tlear.trise.utils.Triple;
 import com.tlear.trise.utils.Tuple;
 
 public class Simulation {
@@ -14,6 +20,7 @@ public class Simulation {
 	private Map<Integer, Integer> timeMap;
 	private int prevKeyframe, nextKeyframe;
 	private int time;
+	private Graph<Vector2> g;
 	
 	public Simulation() {
 		createSim();
@@ -23,8 +30,9 @@ public class Simulation {
 		
 		time = 0;
 		
-		Tuple<Integer, Integer> mapEntry = env.getNextKeyframe(timeMap);
-		timeMap.put(mapEntry.fst, mapEntry.snd);
+		Triple<Integer, Integer, Graph<Vector2>> next = env.getNextKeyframe(timeMap);
+		timeMap.put(next.fst, next.snd);
+		g = next.thd;
 		
 		nextKeyframe++;
 	}
@@ -39,8 +47,9 @@ public class Simulation {
 		if (timeMap.get(nextKeyframe) == time) {
 			prevKeyframe = nextKeyframe;
 			
-			Tuple<Integer, Integer> mapEntry = env.getNextKeyframe(timeMap);
-			timeMap.put(mapEntry.fst, mapEntry.snd);
+			Triple<Integer, Integer, Graph<Vector2>> next = env.getNextKeyframe(timeMap);
+			timeMap.put(next.fst, next.snd);
+			g = next.thd;
 			
 			nextKeyframe++;
 		}
@@ -53,6 +62,20 @@ public class Simulation {
 	
 	public void draw(ShapeRenderer sr) {
 		env.draw(sr);
+		
+		sr.begin(ShapeType.Filled);
+		sr.setColor(0, 0, 0, 1);
+		for (Node<Vector2> n : g.getNodes()) {
+			Vector2 v = n.getValue();
+			sr.circle(v.x, v.y, 5);
+		}
+		sr.end();
+		sr.begin(ShapeType.Line);
+		sr.setColor(0, 0, 0, 1);
+		for (Edge<Vector2> e : g.getEdges()) {
+			sr.line(e.fst.getValue(), e.snd.getValue());
+		}
+		sr.end();
 	}
 	
 	private void createSim() {

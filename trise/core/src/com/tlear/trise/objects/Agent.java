@@ -14,9 +14,11 @@ import com.tlear.trise.environment.Environment;
 import com.tlear.trise.functions.DecisionFunction;
 import com.tlear.trise.functions.GoalFunction;
 import com.tlear.trise.functions.ResultFunction;
+import com.tlear.trise.graph.Graph;
 import com.tlear.trise.interactions.Action;
 import com.tlear.trise.interactions.Actuator;
 import com.tlear.trise.interactions.Sensor;
+import com.tlear.trise.utils.Triple;
 import com.tlear.trise.utils.Tuple;
 
 public class Agent extends DynamicObject {
@@ -82,13 +84,15 @@ public class Agent extends DynamicObject {
 		return speed;
 	}
 	
-	public Tuple<Environment, Tuple<Integer, Integer>> process(Environment env, Map<Integer, Integer> timeMap) {
+	public Triple<Environment, Tuple<Integer, Integer>, Graph<Vector2>> process(Environment env, Map<Integer, Integer> timeMap) {
 		
 		belief = env;
 		/*
 		 * Determine the action to take
 		 */
-		Action act = decide.apply(belief);
+		Tuple<Action, Graph<Vector2>> decision = decide.apply(belief);
+		Action act = decision.fst;
+		Graph<Vector2> g = decision.snd;
 		
 		/*
 		 * Estimate what will happen when we take that action
@@ -125,7 +129,7 @@ public class Agent extends DynamicObject {
 		/*
 		 * Return the updated environment and time map
 		 */
-		return new Tuple<Environment, Tuple<Integer, Integer>>(env, mapEntry);
+		return new Triple<>(env, mapEntry, g);
 	}
 	
 	@Override

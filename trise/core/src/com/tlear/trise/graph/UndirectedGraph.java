@@ -80,6 +80,11 @@ public class UndirectedGraph<T> implements Graph<T> {
 	}
 
 	@Override
+	public String toString() {
+		return "UndirectedGraph [nodes=" + nodes + ", edges=" + edges + "]";
+	}
+
+	@Override
 	public Node<T> findNode(T value) {
 		Node<T> result = null;
 		for (Node<T> n : nodes) {
