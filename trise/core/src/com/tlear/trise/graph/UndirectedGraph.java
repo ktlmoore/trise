@@ -14,6 +14,11 @@ public class UndirectedGraph<T> implements Graph<T> {
 		
 		nodes.add(new Node<T>(source));
 	}
+	
+	public UndirectedGraph() {
+		nodes = null;
+		edges = null;
+	}
 
 	@Override
 	public List<Node<T>> getNodes() {
@@ -88,7 +93,7 @@ public class UndirectedGraph<T> implements Graph<T> {
 	public Node<T> findNode(T value) {
 		Node<T> result = null;
 		for (Node<T> n : nodes) {
-			if (n.getValue() == value) {
+			if (n.getValue().equals(value)) {
 				result = n;
 				break;
 			}

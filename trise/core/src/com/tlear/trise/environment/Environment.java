@@ -4,9 +4,11 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.graph.Graph;
+import com.tlear.trise.graph.TrackedGraph;
 import com.tlear.trise.objects.Agent;
 import com.tlear.trise.objects.StaticGoal;
 import com.tlear.trise.objects.StaticObstacle;
@@ -63,22 +65,27 @@ public class Environment {
 		return true;
 	}
 	
+	public boolean placeObstacle(StaticObstacle o) {
+		obstacles.add(o);
+		return true;
+	}
+	
 	/**
 	 * Generates the next keyframe
 	 * @param timeMap
 	 */
-	public Triple<Integer, Integer, Graph<Vector2>> getNextKeyframe(Map<Integer, Integer> timeMap) {
+	public Triple<Integer, Integer, TrackedGraph<Vector2>> getNextKeyframe(Map<Integer, Integer> timeMap) {
 		
 //		System.out.println("GETTING NEXT KEYFRAME");
 		/*
 		 * we'll probably want to check that we are actually at the latest keyframe
 		 */
 		
-		Triple<Environment, Tuple<Integer, Integer>, Graph<Vector2>> nextKeyframe = agents.getFirst().process(this, timeMap);
+		Triple<Environment, Tuple<Integer, Integer>, TrackedGraph<Vector2>> nextKeyframe = agents.getFirst().process(this, timeMap);
 //		System.out.println("NEXT KEYFRAME: " + nextKeyframe);
 		Tuple<Integer, Integer> mapEntry = nextKeyframe.snd;
 		
-		return new Triple<Integer, Integer, Graph<Vector2>>(mapEntry.fst, mapEntry.snd, nextKeyframe.thd);
+		return new Triple<Integer, Integer, TrackedGraph<Vector2>>(mapEntry.fst, mapEntry.snd, nextKeyframe.thd);
 	}
 	
 	public void update(Map<Integer, Integer> timeMap, int prevKeyframe, int time, int nextKeyframe) {
@@ -123,9 +130,12 @@ public class Environment {
 		}
 	}
 	
-	public void draw(ShapeRenderer sr) {
+	public void draw(ShapeRenderer sr, SpriteBatch batch) {
 		for (Agent a : agents) {
-			a.draw(sr);
+			a.draw(sr, batch);
+		}
+		for (StaticObstacle o : obstacles) {
+			o.draw(sr, batch);
 		}
 	}
 	

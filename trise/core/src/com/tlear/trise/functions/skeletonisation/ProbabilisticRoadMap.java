@@ -8,6 +8,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
 import com.tlear.trise.graph.Graph;
 import com.tlear.trise.graph.Node;
+import com.tlear.trise.graph.TrackedGraph;
+import com.tlear.trise.graph.TrackedUndirectedGraph;
 import com.tlear.trise.graph.UndirectedGraph;
 import com.tlear.trise.objects.StaticObstacle;
 
@@ -26,7 +28,7 @@ public class ProbabilisticRoadMap implements S13n {
 	}
 	
 	@Override
-	public Graph<Vector2> skeletonise(Environment env) {
+	public TrackedGraph<Vector2> skeletonise(Environment env) {
 		
 		Set<Vector2> points = new HashSet<>();
 		
@@ -60,7 +62,7 @@ public class ProbabilisticRoadMap implements S13n {
 		}
 		
 		// Once we have all the points, we create a graph using those as the nodes
-		Graph<Vector2> roadmap = new UndirectedGraph<Vector2>(env.agents.getFirst().pos);
+		TrackedGraph<Vector2> roadmap = new TrackedUndirectedGraph<Vector2>(env.agents.getFirst().pos);
 		points.stream().forEach(p -> roadmap.addNode(p));
 		
 		/*

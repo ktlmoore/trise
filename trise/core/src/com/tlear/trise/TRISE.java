@@ -19,7 +19,7 @@ public class TRISE extends ApplicationAdapter {
 	@Override
 	public void create () {
 		d = 0;
-		frames = 2;
+		frames = 1;
 		
 		sim = new Simulation();
 		
@@ -30,7 +30,7 @@ public class TRISE extends ApplicationAdapter {
 
 	@Override
 	public void render () {
-		Gdx.gl.glClearColor(1, 0, 0, 1);
+		Gdx.gl.glClearColor(1, 0.4f, 0.7f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		d++;
@@ -40,7 +40,7 @@ public class TRISE extends ApplicationAdapter {
 			d = 0;
 		}
 		
-		sim.draw(sr);
+		sim.draw(sr, batch);
 		
 	}
 }

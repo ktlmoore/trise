@@ -7,14 +7,19 @@ import java.util.Map;
 import java.util.Set;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
+import com.tlear.trise.functions.DecideByPRM;
 import com.tlear.trise.functions.DecisionFunction;
 import com.tlear.trise.functions.GoalFunction;
 import com.tlear.trise.functions.ResultFunction;
 import com.tlear.trise.graph.Graph;
+import com.tlear.trise.graph.TrackedGraph;
 import com.tlear.trise.interactions.Action;
 import com.tlear.trise.interactions.Actuator;
 import com.tlear.trise.interactions.Sensor;
@@ -35,10 +40,18 @@ public class Agent extends DynamicObject {
 	private DecisionFunction decide;
 	private Environment belief;
 	
+	private int theta = 0;
+	
 	private float speed;
+	
+	private Texture img;
+	private TextureRegion tex;
 
 	public Agent(float x, float y, float width, float height) {
 		super(x, y, width, height);
+		
+		img = new Texture("benhead.png");
+		tex = new TextureRegion(img);
 		
 		/*
 		 * Add the initial state to the start of our list of keyframes
@@ -54,11 +67,11 @@ public class Agent extends DynamicObject {
 		
 		result = new ResultFunction();
 		goal = new GoalFunction();
-		decide = new DecisionFunction();
+		decide = new DecideByPRM();
 		
 		belief = new Environment();
 		
-		speed = 3.0f;
+		speed = 7.0f;
 		
 		beliefKeyframes.put(0, this.copy());
 		actualKeyframes.put(0, this.copy());
@@ -84,15 +97,15 @@ public class Agent extends DynamicObject {
 		return speed;
 	}
 	
-	public Triple<Environment, Tuple<Integer, Integer>, Graph<Vector2>> process(Environment env, Map<Integer, Integer> timeMap) {
+	public Triple<Environment, Tuple<Integer, Integer>, TrackedGraph<Vector2>> process(Environment env, Map<Integer, Integer> timeMap) {
 		
 		belief = env;
 		/*
 		 * Determine the action to take
 		 */
-		Tuple<Action, Graph<Vector2>> decision = decide.apply(belief);
+		Tuple<Action, TrackedGraph<Vector2>> decision = decide.apply(belief);
 		Action act = decision.fst;
-		Graph<Vector2> g = decision.snd;
+		TrackedGraph<Vector2> g = decision.snd;
 		
 		/*
 		 * Estimate what will happen when we take that action
@@ -129,7 +142,7 @@ public class Agent extends DynamicObject {
 		/*
 		 * Return the updated environment and time map
 		 */
-		return new Triple<>(env, mapEntry, g);
+		return new Triple<Environment, Tuple<Integer, Integer>, TrackedGraph<Vector2>>(env, mapEntry, g);
 	}
 	
 	@Override
@@ -184,10 +197,14 @@ public class Agent extends DynamicObject {
 //		System.out.println("ACTUAL KEYFRAMES AFTER INTERPOLATION: " + actualKeyframes);
 	}
 	
-	public void draw(ShapeRenderer sr) {
-		sr.begin(ShapeType.Line);
-		sr.rect(pos.x, pos.y, width, height);
-		sr.end();
+	public void draw(ShapeRenderer sr, SpriteBatch batch) {
+		theta+=5;
+		batch.begin();
+		batch.draw(tex, pos.x - (width + 30)/2, pos.y - (height+50)/2, ((width + 30) / 2),  ((height + 50) / 2), width + 30, height + 50, 1, 1, theta);
+		batch.end();
+//		sr.begin(ShapeType.Line);
+//		sr.rect(pos.x - (width + 30)/2, pos.y - (height+50)/2, width + 30, height + 50);
+//		sr.end();
 	}
 	
 	public Agent copy() {
