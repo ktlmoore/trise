@@ -1,5 +1,6 @@
 package com.tlear.trise.environment;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -7,6 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.tlear.trise.objects.Agent;
 import com.tlear.trise.objects.StaticGoal;
 import com.tlear.trise.objects.StaticObstacle;
+import com.tlear.trise.utils.Tuple;
 
 public class Environment {
 	public final int maxX;
@@ -16,13 +18,20 @@ public class Environment {
 	public LinkedList<StaticObstacle> obstacles;
 	public LinkedList<StaticGoal> goals;
 	
+	@Override
+	public String toString() {
+		return "Environment [maxX=" + maxX + ", maxY=" + maxY + ", agents="
+				+ agents + ", obstacles=" + obstacles + ", goals=" + goals
+				+ "]";
+	}
+
 	public Environment() {
 		agents = new LinkedList<Agent>();
 		obstacles = new LinkedList<StaticObstacle>();
 		goals = new LinkedList<StaticGoal>();
 		
-		maxX = 0;
-		maxY = 0;
+		maxX = 600;
+		maxY = 480;
 	}
 	
 	public Environment(int maxX, int maxY) {
@@ -43,17 +52,30 @@ public class Environment {
 		this.goals = new LinkedList<StaticGoal>(that.goals);
 	}
 	
-	public int placeAgent(Agent a) {
+	public boolean placeAgent(Agent a) {
+		/*
+		 * We'll want to do some checking that we *can* place this agent
+		 */
 		agents.add(a);
-		return agents.size();
+		return true;
 	}
 	
 	/**
 	 * Generates the next keyframe
 	 * @param timeMap
 	 */
-	public void getNextKeyframe(Map<Integer, Integer> timeMap) {
-		agents.getFirst().process(this, timeMap);
+	public Tuple<Integer, Integer> getNextKeyframe(Map<Integer, Integer> timeMap) {
+		
+//		System.out.println("GETTING NEXT KEYFRAME");
+		/*
+		 * we'll probably want to check that we are actually at the latest keyframe
+		 */
+		
+		Tuple<Environment, Tuple<Integer, Integer>> nextKeyframe = agents.getFirst().process(this, timeMap);
+//		System.out.println("NEXT KEYFRAME: " + nextKeyframe);
+		Tuple<Integer, Integer> mapEntry = nextKeyframe.snd;
+		
+		return mapEntry;
 	}
 	
 	public void update(Map<Integer, Integer> timeMap, int prevKeyframe, int time, int nextKeyframe) {
@@ -68,8 +90,9 @@ public class Environment {
 		 * 		timeMap.length > 0
 		 */
 		
-		// Finds the last keyframe as the largest value in the keys of timeMap
-		int lastKeyframe = timeMap.keySet().stream().max((x, y) -> x - y).orElse(-1);
+//		System.out.println(time);
+		
+		int lastKeyframe = findLastKeyframe(timeMap);
 		
 		if (lastKeyframe < 0) {
 			throw new RuntimeException("Invalid time map " + timeMap.toString());
@@ -93,6 +116,7 @@ public class Environment {
 		
 		for (Agent a : agents) {
 			a.update(timeMap, prevKeyframe, time, nextKeyframe);
+//			System.out.println(a);
 		}
 	}
 	
@@ -100,5 +124,10 @@ public class Environment {
 		for (Agent a : agents) {
 			a.draw(sr);
 		}
+	}
+	
+	private int findLastKeyframe(Map<Integer, Integer> timeMap) {
+		// Finds the last keyframe as the largest value in the keys of timeMap
+		return timeMap.keySet().stream().max((x, y) -> x - y).orElse(-1);
 	}
 }

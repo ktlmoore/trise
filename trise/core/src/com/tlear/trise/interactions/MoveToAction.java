@@ -14,5 +14,16 @@ public class MoveToAction implements Action {
 		destination = to.cpy();
 		motion = destination.cpy().sub(origin);
 		length = motion.len();
+		
+		System.out.println(this);
 	}
+
+	@Override
+	public String toString() {
+		return "MoveToAction [origin=" + origin + ", destination="
+				+ destination + ", motion=" + motion + ", length=" + length
+				+ "]";
+	}
+	
+	
 }

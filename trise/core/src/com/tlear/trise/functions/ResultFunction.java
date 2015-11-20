@@ -19,11 +19,15 @@ public class ResultFunction implements BiFunction<Action, Environment, Tuple<Env
 	}
 
 	public Tuple<Environment, Integer> resolve(MoveToAction act, Environment env) {
+		
+//		System.out.println("RESOLVING ACTION");
 		Environment newEnv = new Environment(env);
 		newEnv.agents.get(0).pos = new Vector2(act.destination);
+		
+//		System.out.println("ACTION LENGTH: " + act.length);
 		int t = (int) (act.length / env.agents.get(0).getSpeed());
 		
-		return new Tuple<Environment, Integer>(newEnv, t);
+		return new Tuple<Environment, Integer>(newEnv, Math.max(t, 1));
 	}
 	
 }

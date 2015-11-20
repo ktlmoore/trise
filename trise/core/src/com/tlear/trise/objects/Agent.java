@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
@@ -20,8 +21,8 @@ import com.tlear.trise.utils.Tuple;
 
 public class Agent extends DynamicObject {
 	
-	private Map<Integer, Agent> beliefKeyframes;
-	private Map<Integer, Agent> actualKeyframes;
+	public Map<Integer, Agent> beliefKeyframes;
+	public Map<Integer, Agent> actualKeyframes;
 	
 	private int lastKeyframe;
 	
@@ -42,8 +43,7 @@ public class Agent extends DynamicObject {
 		 */
 		beliefKeyframes = new LinkedHashMap<Integer, Agent>();
 		actualKeyframes = new LinkedHashMap<Integer, Agent>();
-		beliefKeyframes.put(0, this.copy());
-		actualKeyframes.put(0, this.copy());
+		
 		
 		lastKeyframe = 0;
 		
@@ -56,7 +56,10 @@ public class Agent extends DynamicObject {
 		
 		belief = new Environment();
 		
-		speed = 5.0f;
+		speed = 3.0f;
+		
+		beliefKeyframes.put(0, this.copy());
+		actualKeyframes.put(0, this.copy());
 	}
 	
 	public Agent(Agent that) {
@@ -79,7 +82,9 @@ public class Agent extends DynamicObject {
 		return speed;
 	}
 	
-	public Tuple<Environment, Map<Integer, Integer>> process(Environment env, Map<Integer, Integer> timeMap) {
+	public Tuple<Environment, Tuple<Integer, Integer>> process(Environment env, Map<Integer, Integer> timeMap) {
+		
+		belief = env;
 		/*
 		 * Determine the action to take
 		 */
@@ -105,20 +110,29 @@ public class Agent extends DynamicObject {
 		 * Update actual states based on what will actually happen
 		 */
 		env = actualResult.fst;
-		actualKeyframes.put(lastKeyframe + 1, actualResult.fst.agents.get(0));
+		actualKeyframes.put(lastKeyframe + 1, actualResult.fst.agents.get(0).copy());
+		
+//		System.out.println("ACTUAL KEYFRAMES " + actualKeyframes);
 		
 		/*
 		 * Update keyframing
 		 */
-		timeMap.put(lastKeyframe + 1, timeMap.get(lastKeyframe) + actualResult.snd);
+		Tuple<Integer, Integer> mapEntry = new Tuple<Integer, Integer>(lastKeyframe + 1, timeMap.get(lastKeyframe) + actualResult.snd);
 		lastKeyframe++;
+		
+//		System.out.println(actualKeyframes);
 		
 		/*
 		 * Return the updated environment and time map
 		 */
-		return new Tuple<Environment, Map<Integer, Integer>>(env, timeMap);
+		return new Tuple<Environment, Tuple<Integer, Integer>>(env, mapEntry);
 	}
 	
+	@Override
+	public String toString() {
+		return "Agent [pos = " + pos.toString() + "]";
+	}
+
 	public void update(Map<Integer, Integer> timeMap, int prevKeyframe, int time, int nextKeyframe) {
 		/* prevKeyframe = k-1
 		 * nextKeyframe = k
@@ -146,6 +160,9 @@ public class Agent extends DynamicObject {
 		 * Interpolation
 		 */
 		
+//		System.out.println("INTERPOLATING");
+//		System.out.println("ACTUAL KEYFRAMES BEFORE INTERPOLATION: " + actualKeyframes);
+		
 		float t = time;
 		float kprev = timeMap.get(prevKeyframe);
 		float knext = timeMap.get(nextKeyframe);
@@ -155,7 +172,12 @@ public class Agent extends DynamicObject {
 		Vector2 prevPos = actualKeyframes.get(prevKeyframe).pos.cpy();
 		Vector2 nextPos = actualKeyframes.get(nextKeyframe).pos.cpy();
 		
+//		System.out.println("Prev pos: " + prevPos);
+//		System.out.println("Next pos: " + nextPos);
+		
 		pos.set(prevPos.scl(1 - lambda).add(nextPos.scl(lambda)));
+		
+//		System.out.println("ACTUAL KEYFRAMES AFTER INTERPOLATION: " + actualKeyframes);
 	}
 	
 	public void draw(ShapeRenderer sr) {

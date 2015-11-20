@@ -13,4 +13,9 @@ public class Tuple<T, U> {
 		fst = first;
 		snd = second;
 	}
+
+	@Override
+	public String toString() {
+		return "Tuple [" + fst + ", " + snd + "]";
+	}
 }
