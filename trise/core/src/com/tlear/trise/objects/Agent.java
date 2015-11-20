@@ -14,7 +14,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
-import com.tlear.trise.functions.DecideByPRM;
+import com.tlear.trise.functions.DecideByRandomPRM;
 import com.tlear.trise.functions.DecisionFunction;
 import com.tlear.trise.functions.GoalFunction;
 import com.tlear.trise.functions.ResultFunction;
@@ -67,7 +67,7 @@ public class Agent extends DynamicObject {
 		
 		result = new ResultFunction();
 		goal = new GoalFunction();
-		decide = new DecideByPRM();
+		decide = new DecideByRandomPRM();
 		
 		belief = new Environment();
 		

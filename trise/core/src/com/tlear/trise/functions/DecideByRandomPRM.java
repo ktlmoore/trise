@@ -15,13 +15,13 @@ import com.tlear.trise.interactions.MoveToAction;
 import com.tlear.trise.objects.StaticObstacle;
 import com.tlear.trise.utils.Tuple;
 
-public class DecideByPRM implements DecisionFunction {
+public class DecideByRandomPRM implements DecisionFunction {
 
 	private ProbabilisticRoadMap probabilisticRoadMap;
 	private TrackedGraph<Vector2> prm;
 	private boolean initialised;
 	
-	public DecideByPRM() {
+	public DecideByRandomPRM() {
 		probabilisticRoadMap = new ProbabilisticRoadMap(500, 10);
 		prm = new TrackedUndirectedGraph<Vector2>();
 		initialised = false;
