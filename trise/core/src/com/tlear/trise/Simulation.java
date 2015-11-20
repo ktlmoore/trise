@@ -16,6 +16,7 @@ import com.tlear.trise.graph.Graph;
 import com.tlear.trise.graph.Node;
 import com.tlear.trise.graph.TrackedGraph;
 import com.tlear.trise.objects.Agent;
+import com.tlear.trise.objects.StaticGoal;
 import com.tlear.trise.objects.StaticObstacle;
 import com.tlear.trise.utils.Triple;
 import com.tlear.trise.utils.Tuple;
@@ -114,6 +115,11 @@ public class Simulation {
 		env.placeObstacle(o);
 		o = new StaticObstacle(300, 100, 100, 100);
 		env.placeObstacle(o);
+		
+		StaticGoal g = new StaticGoal(450, 450, 20, 20);
+		env.placeGoal(g);
+		g = new StaticGoal(250, 250, 20, 20);
+		env.placeGoal(g);
 		
 //		System.out.println("Creating sim: " + env);
 		timeMap = new LinkedHashMap<>();

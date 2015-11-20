@@ -70,6 +70,11 @@ public class Environment {
 		return true;
 	}
 	
+	public boolean placeGoal(StaticGoal g) {
+		goals.add(g); 
+		return true;
+	}
+	
 	/**
 	 * Generates the next keyframe
 	 * @param timeMap
@@ -136,6 +141,9 @@ public class Environment {
 		}
 		for (StaticObstacle o : obstacles) {
 			o.draw(sr, batch);
+		}
+		for (StaticGoal g : goals) {
+			g.draw(sr, batch);
 		}
 	}
 	

@@ -63,6 +63,7 @@ public class ProbabilisticRoadMap implements S13n {
 		
 		// Once we have all the points, we create a graph using those as the nodes
 		TrackedGraph<Vector2> roadmap = new TrackedUndirectedGraph<Vector2>(env.agents.getFirst().pos);
+		env.goals.stream().forEach(g -> roadmap.addNode(g.pos));
 		points.stream().forEach(p -> roadmap.addNode(p));
 		
 		/*
