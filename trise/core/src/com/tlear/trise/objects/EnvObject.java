@@ -11,8 +11,8 @@ public class EnvObject {
 	
 	public Vector2 pos;
 	
-	public final float width;
-	public final float height;
+	public float width;
+	public float height;
 	
 	public EnvObject(float x, float y, float width, float height) {
 		
