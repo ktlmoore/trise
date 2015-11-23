@@ -1,4 +1,4 @@
-package com.tlear.trise.functions;
+package com.tlear.trise.functions.decision;
 
 import java.util.function.Function;
 

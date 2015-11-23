@@ -14,10 +14,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
-import com.tlear.trise.functions.DecideByRandomPRM;
-import com.tlear.trise.functions.DecisionFunction;
 import com.tlear.trise.functions.GoalFunction;
 import com.tlear.trise.functions.ResultFunction;
+import com.tlear.trise.functions.decision.DecideByRandomPRM;
+import com.tlear.trise.functions.decision.DecisionFunction;
 import com.tlear.trise.graph.Graph;
 import com.tlear.trise.graph.TrackedGraph;
 import com.tlear.trise.interactions.Action;
@@ -202,8 +202,13 @@ public class Agent extends DynamicObject {
 		batch.begin();
 		batch.draw(tex, pos.x - (width + 30)/2, pos.y - (height+50)/2, ((width + 30) / 2),  ((height + 50) / 2), width + 30, height + 50, 1, 1, theta);
 		batch.end();
+//		sr.begin(ShapeType.Filled);
+//		sr.setColor(1, 1, 1, 0);
+//		sr.rect(pos.x - (width)/2, pos.y - (height)/2, width, height);
+//		sr.end();
 //		sr.begin(ShapeType.Line);
-//		sr.rect(pos.x - (width + 30)/2, pos.y - (height+50)/2, width + 30, height + 50);
+//		sr.setColor(0, 0, 0, 1);
+//		sr.rect(pos.x - (width)/2, pos.y - (height)/2, width, height);
 //		sr.end();
 	}
 	
