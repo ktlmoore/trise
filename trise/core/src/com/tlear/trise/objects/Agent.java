@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
 import com.tlear.trise.functions.GoalFunction;
 import com.tlear.trise.functions.ResultFunction;
+import com.tlear.trise.functions.decision.DecideByBFS;
 import com.tlear.trise.functions.decision.DecideByRandomPRM;
 import com.tlear.trise.functions.decision.DecisionFunction;
 import com.tlear.trise.graph.Graph;
@@ -67,11 +68,11 @@ public class Agent extends DynamicObject {
 		
 		result = new ResultFunction();
 		goal = new GoalFunction();
-		decide = new DecideByRandomPRM();
+		decide = new DecideByBFS(goal);
 		
 		belief = new Environment();
 		
-		speed = 7.0f;
+		speed = 3.0f;
 		
 		beliefKeyframes.put(0, this.copy());
 		actualKeyframes.put(0, this.copy());
@@ -199,17 +200,17 @@ public class Agent extends DynamicObject {
 	
 	public void draw(ShapeRenderer sr, SpriteBatch batch) {
 		theta+=5;
-		batch.begin();
-		batch.draw(tex, pos.x - (width + 30)/2, pos.y - (height+50)/2, ((width + 30) / 2),  ((height + 50) / 2), width + 30, height + 50, 1, 1, theta);
-		batch.end();
-//		sr.begin(ShapeType.Filled);
-//		sr.setColor(1, 1, 1, 0);
-//		sr.rect(pos.x - (width)/2, pos.y - (height)/2, width, height);
-//		sr.end();
-//		sr.begin(ShapeType.Line);
-//		sr.setColor(0, 0, 0, 1);
-//		sr.rect(pos.x - (width)/2, pos.y - (height)/2, width, height);
-//		sr.end();
+////		batch.begin();
+////		batch.draw(tex, pos.x - (width + 30)/2, pos.y - (height+50)/2, ((width + 30) / 2),  ((height + 50) / 2), width + 30, height + 50, 1, 1, theta);
+//		batch.end();
+		sr.begin(ShapeType.Filled);
+		sr.setColor(1, 1, 1, 0);
+		sr.rect(pos.x - (width)/2, pos.y - (height)/2, width, height);
+		sr.end();
+		sr.begin(ShapeType.Line);
+		sr.setColor(0, 0, 0, 1);
+		sr.rect(pos.x - (width)/2, pos.y - (height)/2, width, height);
+		sr.end();
 	}
 	
 	public Agent copy() {
