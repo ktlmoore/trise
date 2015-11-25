@@ -15,7 +15,7 @@ public class GoalFunctionTest {
 	private Environment env;
 	private Node<Vector2> node;
 	private StaticGoal goal;
-	private GoalFunction toTest;
+	private GoalFunction booleanTest, multipleTest;
 
 	@Before
 	public void setUp() throws Exception {
@@ -24,12 +24,20 @@ public class GoalFunctionTest {
 		goal = new StaticGoal(10, 10, 0, 0);
 		env.placeGoal(goal);
 		
-		toTest = new GoalFunction();
+		booleanTest = new BooleanIsGoalFunction();
+		multipleTest = new MultipleGoalsGoalFunction();
 	}
 
 	@Test
-	public void test() {
-		assertTrue(toTest.apply(env, node));
+	public void testBoolean() {
+		assertTrue(booleanTest.apply(env, node));
+		assertTrue(env.goals.contains(goal));
+	}
+	
+	@Test
+	public void testMultiple() {
+		assertTrue(multipleTest.apply(env, node));
+		assertFalse(env.goals.contains(goal));
 	}
 
 }

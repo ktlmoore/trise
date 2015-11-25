@@ -39,7 +39,7 @@ public class DecideByBFS implements DecisionFunction {
 	private boolean initialised;
 	
 	public DecideByBFS(GoalFunction goal) {
-		probabilisticRoadMap = new ProbabilisticRoadMap(100, 10);
+		probabilisticRoadMap = new ProbabilisticRoadMap(1000, 10);
 		frontier = new LinkedList<>();
 		prm = new TrackedUndirectedGraph<>();
 		initialised = false;
@@ -53,20 +53,29 @@ public class DecideByBFS implements DecisionFunction {
 		
 		System.out.println("APPLYING");
 		if (!initialised) {
+			pathBack = new HashMap<Node<Vector2>, Node<Vector2>>();
 			System.out.println("INITIALISING");
 			prm = probabilisticRoadMap.skeletonise(t);
+			initialised = true;
+		}
 			
+		if (path.size() <= 0) {
+			frontier = new LinkedList<>();
+			explored = new HashSet<Node<Vector2>>();
+			pathBack = new HashMap<Node<Vector2>, Node<Vector2>>();
 			Node<Vector2> startNode = prm.findNode(t.agents.getFirst().pos);
 			frontier.add(startNode);
 		
 			Node<Vector2> goalNode = null;
 			System.out.println("SEARCHING");
+			
+			pathBack.put(startNode, startNode);
 			while (!frontier.isEmpty() && goalNode == null) {
-				System.out.println("Frontier has " + frontier.size() + " nodes");
+//				System.out.println("Frontier has " + frontier.size() + " nodes");
 				Node<Vector2> node = frontier.pop();
 				explored.add(node);
-				System.out.println("Frontier has " + frontier.size() + " nodes after popping");
-				System.out.println(node);
+//				System.out.println("Frontier has " + frontier.size() + " nodes after popping");
+//				System.out.println(node);
 				if (goal.apply(t, node)) {
 					goalNode = node;
 				} else {
@@ -77,30 +86,34 @@ public class DecideByBFS implements DecisionFunction {
 							pathBack.put(n, node);
 						}
 					});
-					System.out.println("Frontier has " + frontier.size() + " nodes after exploring");
+//					System.out.println("Frontier has " + frontier.size() + " nodes after exploring");
 				}				
 			}
-			
+			System.out.println("ROUTE FOUND");
 			// Once we have found the goal, we then follow the path back to the start
 			
 			path.add(goalNode);
+			System.out.println("GOAL: " + goalNode);
 			Node<Vector2> node = pathBack.get(goalNode);
 			do {
 				path.add(node);
 				node = pathBack.get(node);
+				System.out.println("NODE: " + node);
+				System.out.println("START: " + startNode);
 			} while(!node.equals(startNode));
 			
 			Collections.reverse(path);
-			
-			initialised = true;
 		}
+			
+		
 		
 		Node<Vector2> next = path.remove(0);
 		if (next == null) {
 			next = new Node<Vector2>(t.agents.getFirst().pos.cpy());
 		}
-		Action a = new MoveToAction(t.agents.getFirst().pos.cpy(), next.getValue().cpy());
 		
+		Action a = new MoveToAction(t.agents.getFirst().pos.cpy(), next.getValue().cpy());
+		prm.visit(next);
 		return new Tuple<Action, TrackedGraph<Vector2>>(a, prm);
 	}
 

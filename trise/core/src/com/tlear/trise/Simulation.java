@@ -120,6 +120,14 @@ public class Simulation {
 		env.placeGoal(g);
 		g = new StaticGoal(250, 250, 20, 20);
 		env.placeGoal(g);
+		g = new StaticGoal(450, 250, 20, 20);
+		env.placeGoal(g);
+		g = new StaticGoal(250, 450, 20, 20);
+		env.placeGoal(g);
+		g = new StaticGoal(250, 50, 20, 20);
+		env.placeGoal(g);
+		g = new StaticGoal(50, 250, 20, 20);
+		env.placeGoal(g);
 		
 //		System.out.println("Creating sim: " + env);
 		timeMap = new LinkedHashMap<>();

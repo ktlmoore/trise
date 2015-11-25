@@ -14,7 +14,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
+import com.tlear.trise.functions.BooleanIsGoalFunction;
 import com.tlear.trise.functions.GoalFunction;
+import com.tlear.trise.functions.MultipleGoalsGoalFunction;
 import com.tlear.trise.functions.ResultFunction;
 import com.tlear.trise.functions.decision.DecideByBFS;
 import com.tlear.trise.functions.decision.DecideByRandomPRM;
@@ -67,7 +69,7 @@ public class Agent extends DynamicObject {
 		actuators = new HashSet<Actuator>();
 		
 		result = new ResultFunction();
-		goal = new GoalFunction();
+		goal = new MultipleGoalsGoalFunction();
 		decide = new DecideByBFS(goal);
 		
 		belief = new Environment();
@@ -200,8 +202,8 @@ public class Agent extends DynamicObject {
 	
 	public void draw(ShapeRenderer sr, SpriteBatch batch) {
 		theta+=5;
-////		batch.begin();
-////		batch.draw(tex, pos.x - (width + 30)/2, pos.y - (height+50)/2, ((width + 30) / 2),  ((height + 50) / 2), width + 30, height + 50, 1, 1, theta);
+//		batch.begin();
+//		batch.draw(tex, pos.x - (width + 30)/2, pos.y - (height+50)/2, ((width + 30) / 2),  ((height + 50) / 2), width + 30, height + 50, 1, 1, theta);
 //		batch.end();
 		sr.begin(ShapeType.Filled);
 		sr.setColor(1, 1, 1, 0);
