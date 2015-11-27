@@ -18,6 +18,30 @@ public class Node<T> {
 		neighbours = new LinkedList<Node<T>>();
 	}
 	
+	@Override
+	public boolean equals(Object that) {
+		if (that == null) {
+			return false;
+		}
+		if (!(that instanceof Node<?>)) {
+			return false;
+		}
+		Node<?> thatNode = (Node<?>) that;
+		if (!thatNode.value.equals(value)) {
+			return false;
+		}
+		if (!thatNode.neighbours.equals(neighbours)) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public Node(Node<T> that) {
+		this.value = that.value;
+		this.neighbours = new LinkedList<Node<T>>(that.neighbours);
+	}
+	
 	public int addNeighbour(Node<T> n) {
 		neighbours.add(n);
 		return neighbours.size();

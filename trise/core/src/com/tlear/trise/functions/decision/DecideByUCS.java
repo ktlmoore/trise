@@ -1,16 +1,21 @@
 package com.tlear.trise.functions.decision;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
 import com.tlear.trise.functions.GoalFunction;
 import com.tlear.trise.functions.skeletonisation.ProbabilisticRoadMap;
+import com.tlear.trise.graph.DistanceToGoalComparator;
+import com.tlear.trise.graph.DistanceToNearestGoalComparator;
 import com.tlear.trise.graph.Node;
 import com.tlear.trise.graph.TrackedGraph;
 import com.tlear.trise.graph.TrackedUndirectedGraph;
@@ -18,31 +23,33 @@ import com.tlear.trise.interactions.Action;
 import com.tlear.trise.interactions.MoveToAction;
 import com.tlear.trise.utils.Tuple;
 
-public class DecideByBFS implements DecisionFunction {
+public class DecideByUCS implements DecisionFunction {
 
 	private ProbabilisticRoadMap probabilisticRoadMap;
+	 
 	
-	
-	private LinkedList<Node<Vector2>> frontier;
-	private HashSet<Node<Vector2>> explored; 
+	private Queue<Node<Vector2>> frontier;
+	private HashSet<Node<Vector2>> explored;
 	
 	private TrackedGraph<Vector2> prm;
 	private GoalFunction goal;
 	
+	private Comparator<Node<Vector2>> compare;
 	
 	private Map<Node<Vector2>, Node<Vector2>> pathBack;	// Path back stores the links back from the goal
 	private List<Node<Vector2>> path = new LinkedList<>();
 	
 	private boolean initialised;
 	
-	public DecideByBFS(GoalFunction goal) {
+	public DecideByUCS(GoalFunction goal) {
 		probabilisticRoadMap = new ProbabilisticRoadMap(1000, 10);
-		frontier = new LinkedList<>();
+		frontier = new PriorityQueue<>();
 		prm = new TrackedUndirectedGraph<>();
 		initialised = false;
 		this.goal = goal;
 		pathBack = new HashMap<Node<Vector2>, Node<Vector2>>();
 		explored = new HashSet<Node<Vector2>>();
+		compare = null;
 	}
 	
 	@Override
@@ -57,7 +64,17 @@ public class DecideByBFS implements DecisionFunction {
 		}
 			
 		if (path.size() <= 0) {
-			frontier = new LinkedList<>();
+			if (compare instanceof DistanceToGoalComparator) {
+				if (compare == null) {
+					compare = new DistanceToGoalComparator<>(t);
+				} else {
+					((DistanceToGoalComparator<Node<Vector2>>) compare).nextGoal();					
+				}
+			} else {
+				compare = new DistanceToNearestGoalComparator<>(t);
+			}
+			
+			frontier = new PriorityQueue<>(compare);
 			explored = new HashSet<Node<Vector2>>();
 			pathBack = new HashMap<Node<Vector2>, Node<Vector2>>();
 			Node<Vector2> startNode = prm.findNode(t.agents.getFirst().pos);
@@ -69,7 +86,7 @@ public class DecideByBFS implements DecisionFunction {
 			pathBack.put(startNode, startNode);
 			while (!frontier.isEmpty() && goalNode == null) {
 //				System.out.println("Frontier has " + frontier.size() + " nodes");
-				Node<Vector2> node = frontier.pop();
+				Node<Vector2> node = frontier.poll();
 				explored.add(node);
 //				System.out.println("Frontier has " + frontier.size() + " nodes after popping");
 //				System.out.println(node);
@@ -113,5 +130,4 @@ public class DecideByBFS implements DecisionFunction {
 		prm.visit(next);
 		return new Tuple<Action, TrackedGraph<Vector2>>(a, prm);
 	}
-
 }

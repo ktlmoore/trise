@@ -2,26 +2,21 @@ package com.tlear.trise.objects;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
 import com.tlear.trise.functions.BooleanIsGoalFunction;
+import com.tlear.trise.functions.DistanceToGoalHeuristicFunction;
 import com.tlear.trise.functions.GoalFunction;
-import com.tlear.trise.functions.MultipleGoalsGoalFunction;
 import com.tlear.trise.functions.ResultFunction;
-import com.tlear.trise.functions.decision.DecideByBFS;
-import com.tlear.trise.functions.decision.DecideByRandomPRM;
+import com.tlear.trise.functions.decision.DecideByAStarSearch;
 import com.tlear.trise.functions.decision.DecisionFunction;
-import com.tlear.trise.graph.Graph;
 import com.tlear.trise.graph.TrackedGraph;
 import com.tlear.trise.interactions.Action;
 import com.tlear.trise.interactions.Actuator;
@@ -50,7 +45,7 @@ public class Agent extends DynamicObject {
 	private Texture img;
 	private TextureRegion tex;
 
-	public Agent(float x, float y, float width, float height) {
+	public Agent(float x, float y, float width, float height, Environment env) {
 		super(x, y, width, height);
 		
 		img = new Texture("benhead.png");
@@ -69,8 +64,9 @@ public class Agent extends DynamicObject {
 		actuators = new HashSet<Actuator>();
 		
 		result = new ResultFunction();
-		goal = new MultipleGoalsGoalFunction();
-		decide = new DecideByBFS(goal);
+		goal = new BooleanIsGoalFunction();
+		decide = new DecideByAStarSearch(goal, new DistanceToGoalHeuristicFunction(env));
+//		decide = new DecideByUCS(goal);
 		
 		belief = new Environment();
 		
@@ -202,17 +198,17 @@ public class Agent extends DynamicObject {
 	
 	public void draw(ShapeRenderer sr, SpriteBatch batch) {
 		theta+=5;
-//		batch.begin();
-//		batch.draw(tex, pos.x - (width + 30)/2, pos.y - (height+50)/2, ((width + 30) / 2),  ((height + 50) / 2), width + 30, height + 50, 1, 1, theta);
-//		batch.end();
-		sr.begin(ShapeType.Filled);
-		sr.setColor(1, 1, 1, 0);
-		sr.rect(pos.x - (width)/2, pos.y - (height)/2, width, height);
-		sr.end();
-		sr.begin(ShapeType.Line);
-		sr.setColor(0, 0, 0, 1);
-		sr.rect(pos.x - (width)/2, pos.y - (height)/2, width, height);
-		sr.end();
+		batch.begin();
+		batch.draw(tex, pos.x - (width + 30)/2, pos.y - (height+50)/2, ((width + 30) / 2),  ((height + 50) / 2), width + 30, height + 50, 1, 1, theta);
+		batch.end();
+//		sr.begin(ShapeType.Filled);
+//		sr.setColor(1, 1, 1, 0);
+//		sr.rect(pos.x - (width)/2, pos.y - (height)/2, width, height);
+//		sr.end();
+//		sr.begin(ShapeType.Line);
+//		sr.setColor(0, 0, 0, 1);
+//		sr.rect(pos.x - (width)/2, pos.y - (height)/2, width, height);
+//		sr.end();
 	}
 	
 	public Agent copy() {

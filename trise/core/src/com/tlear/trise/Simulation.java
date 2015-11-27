@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -12,14 +11,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
 import com.tlear.trise.graph.Edge;
-import com.tlear.trise.graph.Graph;
 import com.tlear.trise.graph.Node;
 import com.tlear.trise.graph.TrackedGraph;
 import com.tlear.trise.objects.Agent;
 import com.tlear.trise.objects.StaticGoal;
 import com.tlear.trise.objects.StaticObstacle;
 import com.tlear.trise.utils.Triple;
-import com.tlear.trise.utils.Tuple;
 
 public class Simulation {
 
@@ -27,7 +24,7 @@ public class Simulation {
 	private Map<Integer, Integer> timeMap;
 	private int prevKeyframe, nextKeyframe;
 	private int time;
-	private TrackedGraph<Vector2> g;
+	private TrackedGraph<Vector2> g; 
 	
 	public Simulation() {
 		createSim();
@@ -104,8 +101,6 @@ public class Simulation {
 	
 	private void createSim() {
 		env = new Environment();
-		Agent a = new Agent(10, 10, 25, 25);
-		env.placeAgent(a);
 		
 		StaticObstacle o = new StaticObstacle(100, 100, 100, 100);
 		env.placeObstacle(o);
@@ -118,16 +113,21 @@ public class Simulation {
 		
 		StaticGoal g = new StaticGoal(450, 450, 20, 20);
 		env.placeGoal(g);
-		g = new StaticGoal(250, 250, 20, 20);
-		env.placeGoal(g);
-		g = new StaticGoal(450, 250, 20, 20);
-		env.placeGoal(g);
-		g = new StaticGoal(250, 450, 20, 20);
-		env.placeGoal(g);
-		g = new StaticGoal(250, 50, 20, 20);
-		env.placeGoal(g);
-		g = new StaticGoal(50, 250, 20, 20);
-		env.placeGoal(g);
+		
+		Agent a = new Agent(10, 10, 25, 25, env);
+		env.placeAgent(a);
+		
+		
+//		g = new StaticGoal(250, 250, 20, 20);
+//		env.placeGoal(g);
+//		g = new StaticGoal(450, 250, 20, 20);
+//		env.placeGoal(g);
+//		g = new StaticGoal(250, 450, 20, 20);
+//		env.placeGoal(g);
+//		g = new StaticGoal(250, 50, 20, 20);
+//		env.placeGoal(g);
+//		g = new StaticGoal(50, 250, 20, 20);
+//		env.placeGoal(g);
 		
 //		System.out.println("Creating sim: " + env);
 		timeMap = new LinkedHashMap<>();

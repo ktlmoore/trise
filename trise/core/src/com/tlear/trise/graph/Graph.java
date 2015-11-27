@@ -2,8 +2,6 @@ package com.tlear.trise.graph;
 
 import java.util.List;
 
-import com.tlear.trise.utils.Tuple;
-
 public interface Graph<T> {
 
 	public List<Node<T>> getNodes();
@@ -16,3 +14,4 @@ public interface Graph<T> {
 	public Edge<T> findEdge(T uValue, T vValue);
 	
 }
+ 

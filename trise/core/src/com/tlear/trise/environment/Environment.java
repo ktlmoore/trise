@@ -1,13 +1,11 @@
 package com.tlear.trise.environment;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.tlear.trise.graph.Graph;
 import com.tlear.trise.graph.TrackedGraph;
 import com.tlear.trise.objects.Agent;
 import com.tlear.trise.objects.StaticGoal;
@@ -28,7 +26,7 @@ public class Environment {
 		return "Environment [maxX=" + maxX + ", maxY=" + maxY + ", agents="
 				+ agents + ", obstacles=" + obstacles + ", goals=" + goals
 				+ "]";
-	}
+	} 
 
 	public Environment() {
 		agents = new LinkedList<Agent>();

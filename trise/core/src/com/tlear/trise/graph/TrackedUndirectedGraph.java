@@ -1,11 +1,7 @@
 package com.tlear.trise.graph;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class TrackedUndirectedGraph<T> extends UndirectedGraph<T> implements
 		TrackedGraph<T>, Graph<T> {
@@ -16,7 +12,7 @@ public class TrackedUndirectedGraph<T> extends UndirectedGraph<T> implements
 		super(source);
 		exploredNodes = new HashSet<>();
 		visit(findNode(source));
-	}
+	} 
 	
 	public TrackedUndirectedGraph() {
 		super();

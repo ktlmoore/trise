@@ -6,11 +6,9 @@ import java.util.Set;
 
 import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
-import com.tlear.trise.graph.Graph;
 import com.tlear.trise.graph.Node;
 import com.tlear.trise.graph.TrackedGraph;
 import com.tlear.trise.graph.TrackedUndirectedGraph;
-import com.tlear.trise.graph.UndirectedGraph;
 import com.tlear.trise.objects.StaticObstacle;
 
 public class ProbabilisticRoadMap implements S13n {
@@ -25,10 +23,23 @@ public class ProbabilisticRoadMap implements S13n {
 	public ProbabilisticRoadMap(int noPoints, int maxNeighbours) {
 		this.noPoints = noPoints;
 		this.maxNeighbours = maxNeighbours;
-	}
+	} 
 	
 	@Override
-	public TrackedGraph<Vector2> skeletonise(Environment env) {
+	public TrackedGraph<Vector2> skeletonise(Environment t) {
+		
+		Environment env = new Environment(t);
+		LinkedList<StaticObstacle> newObs = new LinkedList<StaticObstacle>();
+		
+		for (StaticObstacle o : env.obstacles) {
+			StaticObstacle p = new StaticObstacle(o);
+			p.pos.sub(env.agents.getFirst().width/2, env.agents.getFirst().height/2);
+			p.width += env.agents.getFirst().width;
+			p.height += env.agents.getFirst().height;
+			newObs.add(p);
+		}
+		
+		env.obstacles = new LinkedList<>(newObs);
 		
 		Set<Vector2> points = new HashSet<>();
 		

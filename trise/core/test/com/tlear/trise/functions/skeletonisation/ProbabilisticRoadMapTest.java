@@ -1,6 +1,6 @@
 package com.tlear.trise.functions.skeletonisation;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +18,7 @@ public class ProbabilisticRoadMapTest {
 	@Before
 	public void setUp() throws Exception {
 		env = new Environment();
-		Agent a = new Agent(10, 10, 10, 10);
+		Agent a = new Agent(10, 10, 10, 10, env);
 		env.placeAgent(a);
 	}
 

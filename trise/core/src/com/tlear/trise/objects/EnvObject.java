@@ -3,7 +3,6 @@ package com.tlear.trise.objects;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.collision.Segment;
 
 public class EnvObject {
 	
@@ -22,7 +21,7 @@ public class EnvObject {
 		this.height = height;
 		
 		rect = new Rectangle(x, y, width, height);
-	}
+	} 
 	
 	/**
 	 * Tests whether a point is within or on the object and returns true if it is.

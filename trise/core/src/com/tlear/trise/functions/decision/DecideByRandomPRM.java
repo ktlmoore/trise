@@ -1,18 +1,13 @@
 package com.tlear.trise.functions.decision;
 
-import java.util.LinkedList;
-
 import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
 import com.tlear.trise.functions.skeletonisation.ProbabilisticRoadMap;
-import com.tlear.trise.graph.Graph;
 import com.tlear.trise.graph.Node;
 import com.tlear.trise.graph.TrackedGraph;
 import com.tlear.trise.graph.TrackedUndirectedGraph;
-import com.tlear.trise.graph.UndirectedGraph;
 import com.tlear.trise.interactions.Action;
 import com.tlear.trise.interactions.MoveToAction;
-import com.tlear.trise.objects.StaticObstacle;
 import com.tlear.trise.utils.Tuple;
 
 public class DecideByRandomPRM implements DecisionFunction {
@@ -26,25 +21,14 @@ public class DecideByRandomPRM implements DecisionFunction {
 		prm = new TrackedUndirectedGraph<Vector2>();
 		initialised = false;
 	}
-	
+	 
 	@Override 
 	public Tuple<Action, TrackedGraph<Vector2>> apply(Environment t){
 		
 		if (!initialised) {
-			Environment env = new Environment(t);
-			LinkedList<StaticObstacle> newObs = new LinkedList<StaticObstacle>();
 			
-			for (StaticObstacle o : env.obstacles) {
-				StaticObstacle p = new StaticObstacle(o);
-				p.pos.sub(env.agents.getFirst().width/2, env.agents.getFirst().height/2);
-				p.width += env.agents.getFirst().width;
-				p.height += env.agents.getFirst().height;
-				newObs.add(p);
-			}
 			
-			env.obstacles = new LinkedList<>(newObs);
-			
-			prm = probabilisticRoadMap.skeletonise(env);
+			prm = probabilisticRoadMap.skeletonise(t);
 			initialised = true;
 		}
 		

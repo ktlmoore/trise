@@ -6,10 +6,13 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
 import com.tlear.trise.functions.GoalFunction;
+import com.tlear.trise.functions.HeuristicFunction;
 import com.tlear.trise.functions.skeletonisation.ProbabilisticRoadMap;
 import com.tlear.trise.graph.Node;
 import com.tlear.trise.graph.TrackedGraph;
@@ -18,13 +21,12 @@ import com.tlear.trise.interactions.Action;
 import com.tlear.trise.interactions.MoveToAction;
 import com.tlear.trise.utils.Tuple;
 
-public class DecideByBFS implements DecisionFunction {
+public class DecideByAStarSearch implements DecisionFunction {
 
-	private ProbabilisticRoadMap probabilisticRoadMap;
+	private HeuristicFunction heuristicFunction;
 	
-	
-	private LinkedList<Node<Vector2>> frontier;
-	private HashSet<Node<Vector2>> explored; 
+	private Queue<Node<Vector2>> frontier;
+	private HashSet<Node<Vector2>> explored;
 	
 	private TrackedGraph<Vector2> prm;
 	private GoalFunction goal;
@@ -35,14 +37,17 @@ public class DecideByBFS implements DecisionFunction {
 	
 	private boolean initialised;
 	
-	public DecideByBFS(GoalFunction goal) {
+	private ProbabilisticRoadMap probabilisticRoadMap;
+	
+	public DecideByAStarSearch(GoalFunction goal, HeuristicFunction heuristicFunction) {
 		probabilisticRoadMap = new ProbabilisticRoadMap(1000, 10);
-		frontier = new LinkedList<>();
+		frontier = new PriorityQueue<>();
 		prm = new TrackedUndirectedGraph<>();
 		initialised = false;
 		this.goal = goal;
 		pathBack = new HashMap<Node<Vector2>, Node<Vector2>>();
 		explored = new HashSet<Node<Vector2>>();
+		this.heuristicFunction = heuristicFunction;
 	}
 	
 	@Override
@@ -57,7 +62,8 @@ public class DecideByBFS implements DecisionFunction {
 		}
 			
 		if (path.size() <= 0) {
-			frontier = new LinkedList<>();
+			
+			frontier = new PriorityQueue<>((x, y) -> (int) (heuristicFunction.apply(x) - heuristicFunction.apply(y)));
 			explored = new HashSet<Node<Vector2>>();
 			pathBack = new HashMap<Node<Vector2>, Node<Vector2>>();
 			Node<Vector2> startNode = prm.findNode(t.agents.getFirst().pos);
@@ -68,11 +74,8 @@ public class DecideByBFS implements DecisionFunction {
 			
 			pathBack.put(startNode, startNode);
 			while (!frontier.isEmpty() && goalNode == null) {
-//				System.out.println("Frontier has " + frontier.size() + " nodes");
-				Node<Vector2> node = frontier.pop();
+				Node<Vector2> node = frontier.poll();
 				explored.add(node);
-//				System.out.println("Frontier has " + frontier.size() + " nodes after popping");
-//				System.out.println(node);
 				if (goal.apply(t, node)) {
 					goalNode = node;
 				} else {
@@ -83,11 +86,9 @@ public class DecideByBFS implements DecisionFunction {
 							pathBack.put(n, node);
 						}
 					});
-//					System.out.println("Frontier has " + frontier.size() + " nodes after exploring");
 				}				
 			}
 			System.out.println("ROUTE FOUND");
-			// Once we have found the goal, we then follow the path back to the start
 			
 			path.add(goalNode);
 			System.out.println("GOAL: " + goalNode);
@@ -113,5 +114,5 @@ public class DecideByBFS implements DecisionFunction {
 		prm.visit(next);
 		return new Tuple<Action, TrackedGraph<Vector2>>(a, prm);
 	}
-
+	
 }
