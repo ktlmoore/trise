@@ -102,8 +102,6 @@ public class DecideByAStarSearch implements DecisionFunction {
 			
 			Collections.reverse(path);
 		}
-			
-		
 		
 		Node<Vector2> next = path.remove(0);
 		if (next == null) {

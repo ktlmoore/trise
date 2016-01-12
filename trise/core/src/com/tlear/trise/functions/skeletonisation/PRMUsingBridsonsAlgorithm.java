@@ -11,7 +11,7 @@ import com.tlear.trise.graph.TrackedGraph;
 import com.tlear.trise.graph.TrackedUndirectedGraph;
 import com.tlear.trise.objects.StaticObstacle;
 
-public class ProbabilisticRoadMap implements S13n {
+public class PRMUsingBridsonsAlgorithm implements S13n {
 
 	/**
 	 * The proportion of points to place on the map
@@ -20,7 +20,7 @@ public class ProbabilisticRoadMap implements S13n {
 	private int maxNeighbours;
 	
 	
-	public ProbabilisticRoadMap(int noPoints, int maxNeighbours) {
+	public PRMUsingBridsonsAlgorithm(int noPoints, int maxNeighbours) {
 		this.noPoints = noPoints;
 		this.maxNeighbours = maxNeighbours;
 	} 
@@ -46,35 +46,10 @@ public class ProbabilisticRoadMap implements S13n {
 		
 		Set<Vector2> points = new HashSet<>();
 		
-		for (int i = 0; i < noPoints; i++) {
-			// We place a point randomly in the map and keep trying until we get a safe one
-			boolean placed = false;
-			Vector2 newPoint = new Vector2();	
-			
-			while (!placed) {
-				 newPoint = new Vector2((int) (Math.random() * env.maxX), (int) (Math.random() * env.maxY));
-				 
-				 // Check if the point is unique
-				 boolean unique = !points.contains(newPoint);
-				 
-				 boolean placeable = true;
-				 // Check if point is within any obstacles
-				 for (StaticObstacle o : env.obstacles) {
-					 if (o.containsPoint(newPoint)) {
-						 placeable = false;
-						 points.remove(newPoint);
-						 break;
-					 }
-				 }
-				 
-				 // Check if point is outside of bounds
-				 boolean withinBounds = newPoint.x >= 0 && newPoint.x <= env.maxX && newPoint.y >= 0 && newPoint.y <= env.maxY;
-			 
-				 placed = unique && placeable && withinBounds;
-			}
-			
-			points.add(newPoint);
-		}
+		/*
+		 * DO BRIDSON'S ALGORITHM HERE
+		 */
+		bridson(t, points);
 		
 		// Once we have all the points, we create a graph using those as the nodes
 		TrackedGraph<Vector2> roadmap = new TrackedUndirectedGraph<Vector2>(env.agents.getFirst().pos);
@@ -124,4 +99,42 @@ public class ProbabilisticRoadMap implements S13n {
 		// Returning sp - sq will give us which is further away
 		return (int) ((p.cpy().sub(s).len() - q.cpy().sub(s).len()));
 	}
+	
+	private void bridson(Environment env, Set<Vector2> points) {
+		/*
+		 * INPUT: maxX, maxY
+		 * 		  r minimum distance between samples
+		 * 		  k for number of samples
+		 */
+		
+		// Let's calculate r as being a function of the size of the world and the number of points we want
+		float r = (env.maxX * env.maxY) / noPoints;
+		int k = 30;	// Typical value
+		
+		/*
+		 * STEP 1: Initialise a 2D background grid with cell size r/sqrt(2)
+		 * 			such that each cell has at most one sample.  This is a
+		 * 			2D grid of ints: -1 for no sample, otherwise the index
+		 * 			of the sample in the cell
+		 */
+		
+		float cellSize = (float) (r / (Math.sqrt(2)));
+		int noXCells = (int) (env.maxX / cellSize);
+		int noYCells = (int) (env.maxY / cellSize);
+		int grid[][] = new int[noXCells][noYCells];
+		for (int i = 0; i < noXCells; i++) {
+			for (int j = 0; j < noXCells; j++) {
+				grid[i][j] = -1;
+			}
+		}
+		
+		/*
+		 * STEP 2: Select a random point x0, insert it into the background grid
+		 * 			and initialise the active list with it.
+		 */
+		Vector2 x0 = new Vector2((float) (Math.random() * env.maxX), (float) (Math.random() * env.maxY));
+		LinkedList<Vector2> activePoints = new LinkedList<Vector2>();
+		activePoints.add(x0);
+	}
+
 }
