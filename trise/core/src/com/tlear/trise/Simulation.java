@@ -102,14 +102,14 @@ public class Simulation {
 	private void createSim() {
 		env = new Environment();
 		
-		StaticObstacle o = new StaticObstacle(100, 100, 300, 100);
+		StaticObstacle o = new StaticObstacle(100, 100, 100, 100);
 		env.placeObstacle(o);
-//		o = new StaticObstacle(300, 300, 100, 100);
-//		env.placeObstacle(o);
-		o = new StaticObstacle(100, 300, 300, 100);
+		o = new StaticObstacle(300, 300, 100, 100);
 		env.placeObstacle(o);
-//		o = new StaticObstacle(300, 100, 100, 100);
-//		env.placeObstacle(o);
+		o = new StaticObstacle(100, 300, 100, 100);
+		env.placeObstacle(o);
+		o = new StaticObstacle(300, 100, 100, 100);
+		env.placeObstacle(o);
 		
 		StaticGoal g = new StaticGoal(450, 450, 20, 20);
 		env.placeGoal(g);
@@ -118,16 +118,16 @@ public class Simulation {
 		env.placeAgent(a);
 		
 		
-		g = new StaticGoal(250, 250, 20, 20);
-		env.placeGoal(g);
-		g = new StaticGoal(450, 250, 20, 20);
-		env.placeGoal(g);
-		g = new StaticGoal(250, 450, 20, 20);
-		env.placeGoal(g);
-		g = new StaticGoal(250, 50, 20, 20);
-		env.placeGoal(g);
-		g = new StaticGoal(50, 250, 20, 20);
-		env.placeGoal(g);
+//		g = new StaticGoal(250, 250, 20, 20);
+//		env.placeGoal(g);
+//		g = new StaticGoal(450, 250, 20, 20);
+//		env.placeGoal(g);
+//		g = new StaticGoal(250, 450, 20, 20);
+//		env.placeGoal(g);
+//		g = new StaticGoal(250, 50, 20, 20);
+//		env.placeGoal(g);
+//		g = new StaticGoal(50, 250, 20, 20);
+//		env.placeGoal(g);
 		
 //		System.out.println("Creating sim: " + env);
 		timeMap = new LinkedHashMap<>();

@@ -31,9 +31,6 @@ public class ProbabilisticRoadMap implements S13n {
 		Environment env = new Environment(t);
 		LinkedList<StaticObstacle> newObs = new LinkedList<StaticObstacle>();
 		
-		/*
-		 * Enlarge all the obstacles so that they take into account the width and height of the robot
-		 */
 		for (StaticObstacle o : env.obstacles) {
 			StaticObstacle p = new StaticObstacle(o);
 			p.pos.sub(env.agents.getFirst().width/2, env.agents.getFirst().height/2);
@@ -49,8 +46,7 @@ public class ProbabilisticRoadMap implements S13n {
 		for (int i = 0; i < noPoints; i++) {
 			// We place a point randomly in the map and keep trying until we get a safe one
 			boolean placed = false;
-			Vector2 newPoint = new Vector2();	
-			
+			Vector2 newPoint = new Vector2();
 			while (!placed) {
 				 newPoint = new Vector2((int) (Math.random() * env.maxX), (int) (Math.random() * env.maxY));
 				 
