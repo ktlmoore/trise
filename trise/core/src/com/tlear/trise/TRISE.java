@@ -2,6 +2,7 @@ package com.tlear.trise;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -12,35 +13,55 @@ public class TRISE extends ApplicationAdapter {
 	Texture img;
 	ShapeRenderer sr;
 	Simulation sim;
-	
+
+	public boolean modeEdit = false;
+	public boolean modeSim = false;
+	public boolean showGraph = false;
+
 	int d;
 	int frames;
-	
+
 	@Override
-	public void create () {
+	public void create() {
 		d = 0;
 		frames = 1;
-		
-		sim = new Simulation();
-		
+
+		sim = new Simulation(this);
+
 		batch = new SpriteBatch();
 		img = new Texture("badlogic.jpg");
 		sr = new ShapeRenderer();
 	}
 
 	@Override
-	public void render () {
-		Gdx.gl.glClearColor(1, 0.4f, 0.7f, 1);
+	public void render() {
+		update();
+		checkForInput();
+
+		Gdx.gl.glClearColor(0.5f, 0.4f, 0.7f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
+
+		sim.draw(sr, batch);
+
+	}
+
+	private void update() {
 		d++;
-		
-		if (d % frames == 0) {
+		if (modeSim && d % frames == 0) {
 			sim.update();
 			d = 0;
 		}
-		
-		sim.draw(sr, batch);
-		
+	}
+
+	private void checkForInput() {
+		if (Gdx.input.isKeyJustPressed(Keys.E)) {
+			modeEdit = !modeEdit;
+		}
+		if (Gdx.input.isKeyJustPressed(Keys.S)) {
+			modeSim = !modeSim;
+		}
+		if (Gdx.input.isKeyJustPressed(Keys.G)) {
+			showGraph = !showGraph;
+		}
 	}
 }
