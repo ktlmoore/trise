@@ -76,7 +76,7 @@ public class TRISE extends ApplicationAdapter {
 		}
 		if (modeEdit) {
 			// Deal with mouse presses
-			if (Gdx.input.isTouched()) {
+			if (Gdx.input.justTouched()) {
 
 				// First get the touch position
 				Vector2 touchPosition = new Vector2(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
@@ -87,6 +87,26 @@ public class TRISE extends ApplicationAdapter {
 					System.out.println(obj.toString());
 					sim.selectEnvObject(obj);
 				}
+			}
+
+			if (sim.selectedObject != null) {
+				if (Gdx.input.isKeyPressed(Keys.DOWN)) {
+					sim.selectedObject.pos.y--;
+					sim.dirtyEnvironment();
+				}
+				if (Gdx.input.isKeyPressed(Keys.UP)) {
+					sim.selectedObject.pos.y++;
+					sim.dirtyEnvironment();
+				}
+				if (Gdx.input.isKeyPressed(Keys.LEFT)) {
+					sim.selectedObject.pos.x--;
+					sim.dirtyEnvironment();
+				}
+				if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
+					sim.selectedObject.pos.x++;
+					sim.dirtyEnvironment();
+				}
+
 			}
 		}
 	}

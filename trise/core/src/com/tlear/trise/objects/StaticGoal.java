@@ -10,10 +10,10 @@ public class StaticGoal extends StaticObject {
 		super(x, y, width, height);
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	public void draw(ShapeRenderer sr, SpriteBatch batch) {
 		sr.begin(ShapeType.Line);
-		sr.setColor(0, 1, 1, 1);
+		sr.setColor(selected ? 1 : 0, 1, selected ? 0 : 1, 1);
 		sr.circle(pos.x, pos.y, width + height);
 		sr.end();
 	}

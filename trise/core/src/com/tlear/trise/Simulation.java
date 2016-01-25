@@ -29,7 +29,7 @@ public class Simulation {
 
 	private TRISE parent;
 
-	private EnvObject selectedObject;
+	public EnvObject selectedObject;
 
 	public Simulation(TRISE parent) {
 		this.parent = parent;
@@ -144,7 +144,18 @@ public class Simulation {
 				selectedObject.deselect();
 			}
 			selectedObject = obj;
+		} else {
+			obj.deselect();
+			selectedObject = null;
 		}
+	}
+
+	public void dirtyEnvironment() {
+		env.dirty();
+	}
+
+	public void cleanEnvironment() {
+		env.clean();
 	}
 
 	private void createSim() {

@@ -99,6 +99,11 @@ public class Agent extends DynamicObject {
 	public Triple<Environment, Tuple<Integer, Integer>, TrackedGraph<Vector2>> process(Environment env, Map<Integer, Integer> timeMap) {
 
 		belief = env;
+		if (belief.dirty) {
+			decide = new DecideByAStarSearch(goal, new DistanceToGoalHeuristicFunction(env));
+			belief.clean();
+		}
+
 		/*
 		 * Determine the action to take
 		 */
