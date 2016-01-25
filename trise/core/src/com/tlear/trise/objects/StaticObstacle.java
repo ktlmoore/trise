@@ -10,20 +10,19 @@ public class StaticObstacle extends StaticObject {
 		super(x, y, width, height);
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	public StaticObstacle(StaticObstacle that) {
 		super(that.pos.x, that.pos.y, that.width, that.height);
 	}
-	
+
 	public void draw(ShapeRenderer sr, SpriteBatch batch) {
 		sr.begin(ShapeType.Filled);
 		sr.setColor(0, 0, 0, 1);
 		sr.rect(pos.x, pos.y, width, height);
 		sr.end();
 		sr.begin(ShapeType.Line);
-		sr.setColor(1, 1, 1, 1);
+		sr.setColor(1, 1, selected ? 0 : 1, 1);
 		sr.rect(pos.x, pos.y, width, height);
 		sr.end();
 	}
-
 }

@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.tlear.trise.objects.EnvObject;
 
 public class TRISE extends ApplicationAdapter {
 	SpriteBatch batch;
@@ -62,6 +64,21 @@ public class TRISE extends ApplicationAdapter {
 		}
 		if (Gdx.input.isKeyJustPressed(Keys.G)) {
 			showGraph = !showGraph;
+		}
+		if (modeEdit) {
+			// Deal with mouse presses
+			if (Gdx.input.isTouched()) {
+
+				// First get the touch position
+				Vector2 touchPosition = new Vector2(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+
+				// Then work out what it was that we just touched
+				EnvObject obj = sim.getObjectContainingPoint(touchPosition);
+				if (obj != null) {
+					System.out.println(obj.toString());
+					sim.selectEnvObject(obj);
+				}
+			}
 		}
 	}
 }

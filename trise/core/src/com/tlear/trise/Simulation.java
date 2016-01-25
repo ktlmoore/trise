@@ -14,6 +14,7 @@ import com.tlear.trise.graph.Edge;
 import com.tlear.trise.graph.Node;
 import com.tlear.trise.graph.TrackedGraph;
 import com.tlear.trise.objects.Agent;
+import com.tlear.trise.objects.EnvObject;
 import com.tlear.trise.objects.StaticGoal;
 import com.tlear.trise.objects.StaticObstacle;
 import com.tlear.trise.utils.Triple;
@@ -27,6 +28,8 @@ public class Simulation {
 	private TrackedGraph<Vector2> g;
 
 	private TRISE parent;
+
+	private EnvObject selectedObject;
 
 	public Simulation(TRISE parent) {
 		this.parent = parent;
@@ -43,6 +46,8 @@ public class Simulation {
 		g = next.thd;
 
 		nextKeyframe++;
+
+		selectedObject = null;
 	}
 
 	public void update() {
@@ -91,7 +96,7 @@ public class Simulation {
 					sr.setColor(1, 1, 0, 1);
 				}
 				Vector2 v = n.getValue();
-				sr.circle(v.x, v.y, 5);
+				sr.circle(v.x, v.y, 2);
 			}
 			sr.end();
 		}
@@ -106,6 +111,40 @@ public class Simulation {
 		font.draw(batch, parent.modeEdit ? "EDIT" : "", 600, 100);
 		font.draw(batch, parent.modeSim ? "SIMULATING" : "", 600, 150);
 		batch.end();
+	}
+
+	public EnvObject getObjectContainingPoint(Vector2 pos) {
+		// Returns the environment object that this position contains
+		for (Agent a : env.agents) {
+			if (a.containsPoint(pos)) {
+				return a;
+			}
+		}
+		for (StaticObstacle o : env.obstacles) {
+			if (o.containsPoint(pos)) {
+				return o;
+			}
+		}
+		for (StaticGoal g : env.goals) {
+			if (g.containsPoint(pos)) {
+				return g;
+			}
+		}
+		return null;
+	}
+
+	public void selectEnvObject(EnvObject obj) {
+		// Pre: obj != null
+		if (obj == null) {
+			throw new NullPointerException("Object to be selected must not be null!!!");
+		}
+		if (!obj.selected) {
+			obj.select();
+			if (selectedObject != null) {
+				selectedObject.deselect();
+			}
+			selectedObject = obj;
+		}
 	}
 
 	private void createSim() {

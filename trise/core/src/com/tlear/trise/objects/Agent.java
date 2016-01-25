@@ -209,7 +209,7 @@ public class Agent extends DynamicObject {
 		sr.rect(pos.x - (width) / 2, pos.y - (height) / 2, width, height);
 		sr.end();
 		sr.begin(ShapeType.Line);
-		sr.setColor(0, 0, 0, 1);
+		sr.setColor(selected ? 1 : 0, selected ? 1 : 0, 0, 1);
 		sr.rect(pos.x - (width) / 2, pos.y - (height) / 2, width, height);
 		sr.end();
 	}

@@ -5,26 +5,32 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 public class EnvObject {
-	
+
 	public Rectangle rect;
-	
+
 	public Vector2 pos;
-	
+
 	public float width;
 	public float height;
-	
+
+	public boolean selected;
+
 	public EnvObject(float x, float y, float width, float height) {
-		
+
 		pos = new Vector2(x, y);
-		
+
 		this.width = width;
 		this.height = height;
-		
+
 		rect = new Rectangle(x, y, width, height);
-	} 
-	
+
+		selected = false;
+	}
+
 	/**
-	 * Tests whether a point is within or on the object and returns true if it is.
+	 * Tests whether a point is within or on the object and returns true if it
+	 * is.
+	 * 
 	 * @param p
 	 * @return
 	 */
@@ -37,9 +43,10 @@ public class EnvObject {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Tests whether a point is within the object and returns true if it is.
+	 * 
 	 * @param p
 	 * @return
 	 */
@@ -52,13 +59,13 @@ public class EnvObject {
 		}
 		return true;
 	}
-	
+
 	public boolean intersectsLine(Vector2 a, Vector2 b) {
 		// If either point is in the obstacle then there is an intersection
 		if (strictlyContainsPoint(a) || strictlyContainsPoint(b)) {
 			return true;
 		}
-		
+
 		// Test the line segment against the four lines
 		if (Intersector.intersectSegments(a, b, pos.cpy(), pos.cpy().add(width, 0), new Vector2())) {
 			return true;
@@ -72,7 +79,20 @@ public class EnvObject {
 		if (Intersector.intersectSegments(a, b, pos.cpy().add(0, height), pos.cpy(), new Vector2())) {
 			return true;
 		}
-	
+
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return "EnvObject[POS: " + pos.toString() + ", WIDTH: " + width + ", HEIGHT: " + height + "]";
+	}
+
+	public void select() {
+		selected = true;
+	}
+
+	public void deselect() {
+		selected = false;
 	}
 }
