@@ -55,6 +55,12 @@ public class TRISE extends ApplicationAdapter {
 		}
 	}
 
+	private void reset() {
+		sim = new Simulation(this);
+		d = 0;
+		frames = 1;
+	}
+
 	private void checkForInput() {
 		if (Gdx.input.isKeyJustPressed(Keys.E)) {
 			modeEdit = !modeEdit;
@@ -64,6 +70,9 @@ public class TRISE extends ApplicationAdapter {
 		}
 		if (Gdx.input.isKeyJustPressed(Keys.G)) {
 			showGraph = !showGraph;
+		}
+		if (Gdx.input.isKeyJustPressed(Keys.R)) {
+			reset();
 		}
 		if (modeEdit) {
 			// Deal with mouse presses
