@@ -64,6 +64,7 @@ public class TRISE extends ApplicationAdapter {
 	private void checkForInput() {
 		if (Gdx.input.isKeyJustPressed(Keys.E)) {
 			modeEdit = !modeEdit;
+			modeSim = false;
 		}
 		if (Gdx.input.isKeyJustPressed(Keys.S)) {
 			modeSim = !modeSim;
@@ -89,24 +90,24 @@ public class TRISE extends ApplicationAdapter {
 				}
 			}
 
+			// For dealing with objects when they've been selected
 			if (sim.selectedObject != null) {
-				if (Gdx.input.isKeyPressed(Keys.DOWN)) {
-					sim.selectedObject.pos.y--;
-					sim.dirtyEnvironment();
-				}
-				if (Gdx.input.isKeyPressed(Keys.UP)) {
-					sim.selectedObject.pos.y++;
-					sim.dirtyEnvironment();
-				}
-				if (Gdx.input.isKeyPressed(Keys.LEFT)) {
-					sim.selectedObject.pos.x--;
-					sim.dirtyEnvironment();
-				}
-				if (Gdx.input.isKeyPressed(Keys.RIGHT)) {
-					sim.selectedObject.pos.x++;
-					sim.dirtyEnvironment();
+
+				if (Gdx.input.isTouched()) {
+					Vector2 touchPosition = new Vector2(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+
+					if (sim.selectedObject.containsPoint(touchPosition)) {
+
+						sim.selectedObject.pos.x = touchPosition.x - sim.selectedObject.width / 2;
+						sim.selectedObject.pos.y = touchPosition.y - sim.selectedObject.height / 2;
+
+						sim.dirtyEnvironment();
+					}
 				}
 
+				if (Gdx.input.isKeyJustPressed(Keys.DEL) || Gdx.input.isKeyJustPressed(Keys.BACKSPACE)) {
+					sim.deleteObject(sim.selectedObject);
+				}
 			}
 		}
 	}

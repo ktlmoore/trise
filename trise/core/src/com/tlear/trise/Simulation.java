@@ -115,11 +115,11 @@ public class Simulation {
 
 	public EnvObject getObjectContainingPoint(Vector2 pos) {
 		// Returns the environment object that this position contains
-		for (Agent a : env.agents) {
-			if (a.containsPoint(pos)) {
-				return a;
-			}
-		}
+		// for (Agent a : env.agents) {
+		// if (a.containsPoint(pos)) {
+		// return a;
+		// }
+		// }
 		for (StaticObstacle o : env.obstacles) {
 			if (o.containsPoint(pos)) {
 				return o;
@@ -190,5 +190,18 @@ public class Simulation {
 		// System.out.println("Creating sim: " + env);
 		timeMap = new LinkedHashMap<>();
 		timeMap.put(0, 0);
+	}
+
+	public void deleteObject(EnvObject obj) {
+		if (obj instanceof Agent) {
+			env.agents.remove(obj);
+		} else if (obj instanceof StaticObstacle) {
+			env.obstacles.remove(obj);
+		} else if (obj instanceof StaticGoal) {
+			env.goals.remove(obj);
+		} else {
+			throw new RuntimeException("Could not delete object from simulation");
+		}
+
 	}
 }
