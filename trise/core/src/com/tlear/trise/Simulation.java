@@ -3,6 +3,7 @@ package com.tlear.trise;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -58,6 +59,15 @@ public class Simulation {
 
 		// System.out.println(nextKeyframe);
 
+		if (env.agents.isEmpty()) {
+			System.out.println("NO AGENT");
+			parent.modeSim = false;
+		}
+		if (env.goals.isEmpty()) {
+			System.out.println("NO GOAL");
+			parent.modeSim = false;
+		}
+
 		if (timeMap.get(nextKeyframe) == time) {
 			prevKeyframe = nextKeyframe;
 
@@ -107,9 +117,11 @@ public class Simulation {
 		// g.getNodes().size());
 
 		batch.begin();
-		font.draw(batch, (float) (100 * g.getExploredNodes().size() / g.getNodes().size()) + "%", 600, 50);
+		// font.draw(batch, (float) (100 * g.getExploredNodes().size() /
+		// g.getNodes().size()) + "%", 600, 50);
 		font.draw(batch, parent.modeEdit ? "EDIT" : "", 600, 100);
 		font.draw(batch, parent.modeSim ? "SIMULATING" : "", 600, 150);
+		font.draw(batch, parent.modeNewObject ? "NEW OBJECT" : "", 600, 200);
 		batch.end();
 	}
 
@@ -203,5 +215,20 @@ public class Simulation {
 			throw new RuntimeException("Could not delete object from simulation");
 		}
 
+	}
+
+	public void addObject(boolean agent, boolean obstacle, boolean goal) {
+		if (agent) {
+			System.out.println("NOT YET IMPLEMENTED");
+
+		} else if (obstacle) {
+			StaticObstacle o = new StaticObstacle(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), 50, 50);
+			env.placeObstacle(o);
+		} else if (goal) {
+			System.out.println("NOT YET IMPLEMENTED");
+
+		}
+
+		dirtyEnvironment();
 	}
 }

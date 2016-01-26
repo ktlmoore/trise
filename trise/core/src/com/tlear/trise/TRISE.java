@@ -20,6 +20,8 @@ public class TRISE extends ApplicationAdapter {
 	public boolean modeSim = false;
 	public boolean showGraph = false;
 
+	public boolean modeNewObject = false;
+
 	int d;
 	int frames;
 
@@ -87,6 +89,16 @@ public class TRISE extends ApplicationAdapter {
 				if (obj != null) {
 					System.out.println(obj.toString());
 					sim.selectEnvObject(obj);
+				}
+			}
+
+			// For adding new objects
+			if (Gdx.input.isKeyJustPressed(Keys.N)) {
+				modeNewObject = !modeNewObject;
+			}
+			if (modeNewObject) {
+				if (Gdx.input.isKeyJustPressed(Keys.O)) {
+					sim.addObject(false, true, false);
 				}
 			}
 
