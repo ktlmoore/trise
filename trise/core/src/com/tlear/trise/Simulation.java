@@ -119,9 +119,9 @@ public class Simulation {
 		batch.begin();
 		// font.draw(batch, (float) (100 * g.getExploredNodes().size() /
 		// g.getNodes().size()) + "%", 600, 50);
-		font.draw(batch, parent.modeEdit ? "EDIT" : "", 600, 100);
-		font.draw(batch, parent.modeSim ? "SIMULATING" : "", 600, 150);
-		font.draw(batch, parent.modeNewObject ? "NEW OBJECT" : "", 600, 200);
+		font.draw(batch, parent.modeEdit ? "EDIT" : "", Gdx.graphics.getWidth() * 9 / 10, 100);
+		font.draw(batch, parent.modeSim ? "SIMULATING" : "", Gdx.graphics.getWidth() * 9 / 10, 150);
+		font.draw(batch, parent.modeNewObject ? "NEW OBJECT" : "", Gdx.graphics.getWidth() * 9 / 10, 200);
 		batch.end();
 	}
 
