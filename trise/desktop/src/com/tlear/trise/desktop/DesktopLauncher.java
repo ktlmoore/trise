@@ -9,8 +9,8 @@ public class DesktopLauncher {
 	public static void main(String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "T.R.I.S.E";
-		// config.width = 640;
-		// config.height = 500;
+		config.width = 1080;
+		config.height = 920;
 		new LwjglApplication(new TRISE(), config);
 	}
 }
