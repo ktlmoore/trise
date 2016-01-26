@@ -12,9 +12,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
-import com.tlear.trise.functions.BooleanIsGoalFunction;
 import com.tlear.trise.functions.DistanceToGoalHeuristicFunction;
 import com.tlear.trise.functions.GoalFunction;
+import com.tlear.trise.functions.MultipleGoalsGoalFunction;
 import com.tlear.trise.functions.ResultFunction;
 import com.tlear.trise.functions.decision.DecideByAStarSearch;
 import com.tlear.trise.functions.decision.DecisionFunction;
@@ -64,7 +64,8 @@ public class Agent extends DynamicObject {
 		actuators = new HashSet<Actuator>();
 
 		result = new ResultFunction();
-		goal = new BooleanIsGoalFunction();
+		// goal = new BooleanIsGoalFunction();
+		goal = new MultipleGoalsGoalFunction();
 		decide = new DecideByAStarSearch(goal, new DistanceToGoalHeuristicFunction(env));
 		// decide = new DecideByUCS(goal);
 

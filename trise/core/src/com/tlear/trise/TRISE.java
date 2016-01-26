@@ -71,7 +71,7 @@ public class TRISE extends ApplicationAdapter {
 		if (Gdx.input.isKeyJustPressed(Keys.S)) {
 			modeSim = !modeSim;
 		}
-		if (Gdx.input.isKeyJustPressed(Keys.G)) {
+		if (Gdx.input.isKeyJustPressed(Keys.V)) {
 			showGraph = !showGraph;
 		}
 		if (Gdx.input.isKeyJustPressed(Keys.R)) {
@@ -96,9 +96,16 @@ public class TRISE extends ApplicationAdapter {
 			if (Gdx.input.isKeyJustPressed(Keys.N)) {
 				modeNewObject = !modeNewObject;
 			}
+
 			if (modeNewObject) {
+				// Add an obstacle
 				if (Gdx.input.isKeyJustPressed(Keys.O)) {
 					sim.addObject(false, true, false);
+				}
+
+				// Add a goal
+				if (Gdx.input.isKeyJustPressed(Keys.G)) {
+					sim.addObject(false, false, true);
 				}
 			}
 

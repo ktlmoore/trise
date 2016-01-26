@@ -225,7 +225,15 @@ public class Simulation {
 			StaticObstacle o = new StaticObstacle(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), 50, 50);
 			env.placeObstacle(o);
 		} else if (goal) {
-			System.out.println("NOT YET IMPLEMENTED");
+			Vector2 mousePos = new Vector2(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+			for (StaticObstacle o : env.obstacles) {
+				if (o.containsPoint(mousePos)) {
+					System.out.println("COULD NOT PLACE GOAL IN OBSTACLE");
+					return;
+				}
+			}
+			StaticGoal g = new StaticGoal(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), 20, 20);
+			env.placeGoal(g);
 
 		}
 

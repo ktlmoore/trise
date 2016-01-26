@@ -3,6 +3,7 @@ package com.tlear.trise.environment;
 import java.util.LinkedList;
 import java.util.Map;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -33,8 +34,8 @@ public class Environment {
 		obstacles = new LinkedList<StaticObstacle>();
 		goals = new LinkedList<StaticGoal>();
 
-		maxX = 600;
-		maxY = 480;
+		maxX = Gdx.graphics.getWidth();
+		maxY = Gdx.graphics.getHeight();
 
 		dirty = false;
 	}
@@ -140,14 +141,14 @@ public class Environment {
 	}
 
 	public void draw(ShapeRenderer sr, SpriteBatch batch) {
-		for (Agent a : agents) {
-			a.draw(sr, batch);
-		}
 		for (StaticObstacle o : obstacles) {
 			o.draw(sr, batch);
 		}
 		for (StaticGoal g : goals) {
 			g.draw(sr, batch);
+		}
+		for (Agent a : agents) {
+			a.draw(sr, batch);
 		}
 	}
 
