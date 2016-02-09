@@ -1,8 +1,9 @@
 package com.tlear.trise.functions.skeletonisation;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Set;
+import java.util.List;
+import java.util.Map;
 
 import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
@@ -11,21 +12,16 @@ import com.tlear.trise.graph.TrackedGraph;
 import com.tlear.trise.graph.TrackedUndirectedGraph;
 import com.tlear.trise.objects.StaticObstacle;
 
-public class ProbabilisticRoadMap implements S13n {
+public class BridsonsPRM extends ProbabilisticRoadMap {
 
-	/**
-	 * The proportion of points to place on the map
-	 */
-	private int noPoints;
-	protected int maxNeighbours;
-
-	public ProbabilisticRoadMap(int noPoints, int maxNeighbours) {
-		this.noPoints = noPoints;
-		this.maxNeighbours = maxNeighbours;
+	public BridsonsPRM(int noPoints, int maxNeighbours) {
+		super(noPoints, maxNeighbours);
 	}
 
 	@Override
 	public TrackedGraph<Vector2> skeletonise(Environment t) {
+
+		System.out.println("BRIDSON");
 
 		Environment env = new Environment(t);
 		LinkedList<StaticObstacle> newObs = new LinkedList<StaticObstacle>();
@@ -40,43 +36,62 @@ public class ProbabilisticRoadMap implements S13n {
 
 		env.obstacles = new LinkedList<>(newObs);
 
-		Set<Vector2> points = new HashSet<>();
+		Map<Integer, Vector2> points = new HashMap<>();
+		List<Vector2> activeList = new LinkedList<>();
 
-		for (int i = 0; i < noPoints; i++) {
-			// We place a point randomly in the map and keep trying until we get
-			// a safe one
-			boolean placed = false;
-			Vector2 newPoint = new Vector2();
-			while (!placed) {
-				newPoint = new Vector2((int) (Math.random() * env.maxX), (int) (Math.random() * env.maxY));
+		// We use Bridson's algorithm to generate points
+		// k is number of samples to try before rejection
+		// r is the minimum distance between samples.
+		// Step 0: initialise a 2-dimensional grid for storing samples, with
+		// cell size r/sqrt(n)
+		// Each cell will contain at most one sample.
+		int k = 30; // Typical value
+		int r = 10; // Spread out by 10 pixels
+		int[][] samples = new int[env.maxX / r][env.maxY / r];
+		int ptr = 0;
 
-				// Check if the point is unique
-				boolean unique = !points.contains(newPoint);
+		// Step 1: Select a point x0 randomly, insert it into the samples and
+		// initialise the active list with this index
+		Vector2 x0 = new Vector2((float) (Math.random() * env.maxX), (float) (Math.random() * env.maxY));
+		points.put(ptr, x0);
+		activeList.add(x0);
+		samples[(int) (x0.x / r)][(int) (x0.y / r)] = ptr;
 
-				boolean placeable = true;
-				// Check if point is within any obstacles
-				for (StaticObstacle o : env.obstacles) {
-					if (o.containsPoint(newPoint)) {
-						placeable = false;
-						points.remove(newPoint);
-						break;
-					}
+		ptr++;
+
+		// Step 2: While the active list is not empty
+		// Choose a random index in it, xi
+		// Up to k times, pick a point between r and 2r away from xi
+		// Check if it is too close to any other samples using the background
+		// grid. If it isn't we add it. If we fail after k, remove xi
+
+		while (!activeList.isEmpty()) {
+
+			Vector2 xi = activeList.get(0);
+
+			for (int i = 0; i < k; i++) {
+
+				System.out.println(i);
+				float theta = (float) (Math.random() * 360);
+				Vector2 newVector = new Vector2();
+				newVector.setAngle(theta);
+				newVector.setLength(r + (float) (Math.random() * r));
+
+				if (samples[(int) (newVector.x / r)][(int) (newVector.y / r)] != 0) {
+					points.put(ptr, xi);
+					activeList.add(xi);
+					samples[(int) (newVector.x / r)][(int) (newVector.y / r)] = ptr;
+					ptr++;
 				}
-
-				// Check if point is outside of bounds
-				boolean withinBounds = newPoint.x >= 0 && newPoint.x <= env.maxX && newPoint.y >= 0 && newPoint.y <= env.maxY;
-
-				placed = unique && placeable && withinBounds;
 			}
-
-			points.add(newPoint);
+			activeList.remove(0);
 		}
 
 		// Once we have all the points, we create a graph using those as the
 		// nodes
 		TrackedGraph<Vector2> roadmap = new TrackedUndirectedGraph<Vector2>(env.agents.getFirst().pos);
 		env.goals.stream().forEach(g -> roadmap.addNode(g.pos));
-		points.stream().forEach(p -> roadmap.addNode(p));
+		points.values().stream().forEach(p -> roadmap.addNode(p));
 
 		/*
 		 * We then go through the roadmap and connect each point to its closest
@@ -119,16 +134,6 @@ public class ProbabilisticRoadMap implements S13n {
 
 	private int isCloser(Vector2 p, Vector2 q, Vector2 s) {
 		// Returning sp - sq will give us which is further away
-		float dist = (p.cpy().sub(s).len() - q.cpy().sub(s).len());
-		if (dist == 0.0) {
-			return 0;
-		}
-		if (dist > 0.0) {
-			return 1;
-		}
-		if (dist < 0.0) {
-			return -1;
-		}
-		throw new RuntimeException("ERROR");
+		return (int) ((p.cpy().sub(s).len() - q.cpy().sub(s).len()));
 	}
 }

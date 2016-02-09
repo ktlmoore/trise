@@ -13,7 +13,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
 import com.tlear.trise.functions.GoalFunction;
 import com.tlear.trise.functions.HeuristicFunction;
-import com.tlear.trise.functions.skeletonisation.ProbabilisticRoadMap;
+import com.tlear.trise.functions.skeletonisation.GridMap;
+import com.tlear.trise.functions.skeletonisation.S13n;
 import com.tlear.trise.graph.Node;
 import com.tlear.trise.graph.TrackedGraph;
 import com.tlear.trise.graph.TrackedUndirectedGraph;
@@ -38,10 +39,11 @@ public class DecideByAStarSearch implements DecisionFunction {
 
 	private boolean initialised;
 
-	private ProbabilisticRoadMap probabilisticRoadMap;
+	private S13n map;
 
 	public DecideByAStarSearch(GoalFunction goal, HeuristicFunction heuristicFunction) {
-		probabilisticRoadMap = new ProbabilisticRoadMap(1000, 10);
+		// probabilisticRoadMap = new ProbabilisticRoadMap(1000, 10);
+		map = new GridMap(10);
 		frontier = new PriorityQueue<>();
 		prm = new TrackedUndirectedGraph<>();
 		initialised = false;
@@ -58,7 +60,7 @@ public class DecideByAStarSearch implements DecisionFunction {
 		if (!initialised) {
 			pathBack = new HashMap<Node<Vector2>, Node<Vector2>>();
 			System.out.println("INITIALISING");
-			prm = probabilisticRoadMap.skeletonise(t);
+			prm = map.skeletonise(t);
 			initialised = true;
 			t.clean();
 		}

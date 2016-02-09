@@ -7,14 +7,14 @@ public class UndirectedGraph<T> implements Graph<T> {
 
 	protected List<Node<T>> nodes;
 	protected List<Edge<T>> edges;
-	
+
 	public UndirectedGraph(T source) {
 		nodes = new LinkedList<Node<T>>();
 		edges = new LinkedList<Edge<T>>();
-		
+
 		nodes.add(new Node<T>(source));
 	}
-	
+
 	public UndirectedGraph() {
 		nodes = null;
 		edges = null;
@@ -41,10 +41,13 @@ public class UndirectedGraph<T> implements Graph<T> {
 
 	@Override
 	public boolean addEdge(Node<T> u, Node<T> v) {
+		if (u == null || v == null) {
+			return false;
+		}
 		if (findEdge(u.getValue(), v.getValue()) == null) {
 			edges.add(new Edge<>(u, v));
 			edges.add(new Edge<>(v, u));
-			
+
 			u.addNeighbour(v);
 			v.addNeighbour(u);
 			return true;
@@ -69,14 +72,14 @@ public class UndirectedGraph<T> implements Graph<T> {
 	public boolean deleteEdge(Node<T> u, Node<T> v) {
 		Edge<T> toDelete = findEdge(u.getValue(), v.getValue());
 		Edge<T> toDeleteBack = findEdge(v.getValue(), u.getValue());
-		
+
 		if (toDelete != null && toDeleteBack != null) {
-			
+
 			v.deleteNeighbour(u);
 			u.deleteNeighbour(v);
-			
+
 			return edges.remove(toDelete);
-			
+
 		}
 		if (toDelete != null || toDeleteBack != null) {
 			throw new RuntimeException("Undirected Graph does not have both a forward and back edge between two linked nodes: " + u + " and " + v);
@@ -93,6 +96,8 @@ public class UndirectedGraph<T> implements Graph<T> {
 	public Node<T> findNode(T value) {
 		Node<T> result = null;
 		for (Node<T> n : nodes) {
+			// System.out.println(n);
+			// System.out.println(n.getValue());
 			if (n.getValue().equals(value)) {
 				result = n;
 				break;

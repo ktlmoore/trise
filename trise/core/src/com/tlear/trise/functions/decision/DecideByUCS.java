@@ -13,6 +13,7 @@ import java.util.Queue;
 import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
 import com.tlear.trise.functions.GoalFunction;
+import com.tlear.trise.functions.skeletonisation.BridsonsPRM;
 import com.tlear.trise.functions.skeletonisation.ProbabilisticRoadMap;
 import com.tlear.trise.graph.DistanceToGoalComparator;
 import com.tlear.trise.graph.DistanceToNearestGoalComparator;
@@ -26,23 +27,24 @@ import com.tlear.trise.utils.Tuple;
 public class DecideByUCS implements DecisionFunction {
 
 	private ProbabilisticRoadMap probabilisticRoadMap;
-	 
-	
+
 	private Queue<Node<Vector2>> frontier;
 	private HashSet<Node<Vector2>> explored;
-	
+
 	private TrackedGraph<Vector2> prm;
 	private GoalFunction goal;
-	
+
 	private Comparator<Node<Vector2>> compare;
-	
-	private Map<Node<Vector2>, Node<Vector2>> pathBack;	// Path back stores the links back from the goal
+
+	private Map<Node<Vector2>, Node<Vector2>> pathBack; // Path back stores the
+														// links back from the
+														// goal
 	private List<Node<Vector2>> path = new LinkedList<>();
-	
+
 	private boolean initialised;
-	
+
 	public DecideByUCS(GoalFunction goal) {
-		probabilisticRoadMap = new ProbabilisticRoadMap(1000, 10);
+		probabilisticRoadMap = new BridsonsPRM(1000, 10);
 		frontier = new PriorityQueue<>();
 		prm = new TrackedUndirectedGraph<>();
 		initialised = false;
@@ -51,10 +53,10 @@ public class DecideByUCS implements DecisionFunction {
 		explored = new HashSet<Node<Vector2>>();
 		compare = null;
 	}
-	
+
 	@Override
 	public Tuple<Action, TrackedGraph<Vector2>> apply(Environment t) {
-		
+
 		System.out.println("APPLYING");
 		if (!initialised) {
 			pathBack = new HashMap<Node<Vector2>, Node<Vector2>>();
@@ -62,50 +64,54 @@ public class DecideByUCS implements DecisionFunction {
 			prm = probabilisticRoadMap.skeletonise(t);
 			initialised = true;
 		}
-			
+
 		if (path.size() <= 0) {
 			if (compare instanceof DistanceToGoalComparator) {
 				if (compare == null) {
 					compare = new DistanceToGoalComparator<>(t);
 				} else {
-					((DistanceToGoalComparator<Node<Vector2>>) compare).nextGoal();					
+					((DistanceToGoalComparator<Node<Vector2>>) compare).nextGoal();
 				}
 			} else {
 				compare = new DistanceToNearestGoalComparator<>(t);
 			}
-			
+
 			frontier = new PriorityQueue<>(compare);
 			explored = new HashSet<Node<Vector2>>();
 			pathBack = new HashMap<Node<Vector2>, Node<Vector2>>();
 			Node<Vector2> startNode = prm.findNode(t.agents.getFirst().pos);
 			frontier.add(startNode);
-		
+
 			Node<Vector2> goalNode = null;
 			System.out.println("SEARCHING");
-			
+
 			pathBack.put(startNode, startNode);
 			while (!frontier.isEmpty() && goalNode == null) {
-//				System.out.println("Frontier has " + frontier.size() + " nodes");
+				// System.out.println("Frontier has " + frontier.size() +
+				// " nodes");
 				Node<Vector2> node = frontier.poll();
 				explored.add(node);
-//				System.out.println("Frontier has " + frontier.size() + " nodes after popping");
-//				System.out.println(node);
+				// System.out.println("Frontier has " + frontier.size() +
+				// " nodes after popping");
+				// System.out.println(node);
 				if (goal.apply(t, node)) {
 					goalNode = node;
 				} else {
 					node.getNeighbours().forEach(n -> {
 						if (!explored.contains(n)) {
-							
+
 							frontier.add(n);
 							pathBack.put(n, node);
 						}
 					});
-//					System.out.println("Frontier has " + frontier.size() + " nodes after exploring");
-				}				
+					// System.out.println("Frontier has " + frontier.size() +
+					// " nodes after exploring");
+				}
 			}
 			System.out.println("ROUTE FOUND");
-			// Once we have found the goal, we then follow the path back to the start
-			
+			// Once we have found the goal, we then follow the path back to the
+			// start
+
 			path.add(goalNode);
 			System.out.println("GOAL: " + goalNode);
 			Node<Vector2> node = pathBack.get(goalNode);
@@ -114,18 +120,16 @@ public class DecideByUCS implements DecisionFunction {
 				node = pathBack.get(node);
 				System.out.println("NODE: " + node);
 				System.out.println("START: " + startNode);
-			} while(!node.equals(startNode));
-			
+			} while (!node.equals(startNode));
+
 			Collections.reverse(path);
 		}
-			
-		
-		
+
 		Node<Vector2> next = path.remove(0);
 		if (next == null) {
 			next = new Node<Vector2>(t.agents.getFirst().pos.cpy());
 		}
-		
+
 		Action a = new MoveToAction(t.agents.getFirst().pos.cpy(), next.getValue().cpy());
 		prm.visit(next);
 		return new Tuple<Action, TrackedGraph<Vector2>>(a, prm);
