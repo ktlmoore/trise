@@ -16,6 +16,7 @@ import com.tlear.trise.graph.TrackedGraph;
 import com.tlear.trise.graph.TrackedUndirectedGraph;
 import com.tlear.trise.interactions.Action;
 import com.tlear.trise.interactions.MoveToAction;
+import com.tlear.trise.metrics.MutableMetrics;
 import com.tlear.trise.utils.Tuple;
 
 public class DecideByBFS implements DecisionFunction {
@@ -33,6 +34,8 @@ public class DecideByBFS implements DecisionFunction {
 	private Map<Node<Vector2>, Node<Vector2>> pathBack;	// Path back stores the links back from the goal
 	private List<Node<Vector2>> path = new LinkedList<>();
 	
+	private MutableMetrics metrics;
+	
 	private boolean initialised;
 	
 	public DecideByBFS(GoalFunction goal) {
@@ -43,16 +46,25 @@ public class DecideByBFS implements DecisionFunction {
 		this.goal = goal;
 		pathBack = new HashMap<Node<Vector2>, Node<Vector2>>();
 		explored = new HashSet<Node<Vector2>>();
+		
+		metrics = new MutableMetrics();
 	}
 	
 	@Override
-	public Tuple<Action, TrackedGraph<Vector2>> apply(Environment t) {
+	public Tuple<MutableMetrics, Tuple<Action, TrackedGraph<Vector2>>> apply(Environment t) {
 		
 		System.out.println("APPLYING");
 		if (!initialised) {
+			metrics.reset();
 			pathBack = new HashMap<Node<Vector2>, Node<Vector2>>();
 			System.out.println("INITIALISING");
+			
+			long startTime = System.currentTimeMillis();
 			prm = probabilisticRoadMap.skeletonise(t);
+			long endTime = System.currentTimeMillis();
+			
+			metrics.setTimeToSkeletonise(endTime - startTime);
+			
 			initialised = true;
 		}
 			
@@ -67,15 +79,22 @@ public class DecideByBFS implements DecisionFunction {
 			System.out.println("SEARCHING");
 			
 			pathBack.put(startNode, startNode);
+			
+			int nodesExplored = 0;
+			int nodesInFrontier = 1;
+			
+			long startTime = System.currentTimeMillis();
 			while (!frontier.isEmpty() && goalNode == null) {
 //				System.out.println("Frontier has " + frontier.size() + " nodes");
 				Node<Vector2> node = frontier.pop();
 				explored.add(node);
+				nodesExplored++;
 //				System.out.println("Frontier has " + frontier.size() + " nodes after popping");
 //				System.out.println(node);
 				if (goal.apply(t, node)) {
 					goalNode = node;
 				} else {
+					int oldFrontier = frontier.size();
 					node.getNeighbours().forEach(n -> {
 						if (!explored.contains(n)) {
 							
@@ -83,9 +102,16 @@ public class DecideByBFS implements DecisionFunction {
 							pathBack.put(n, node);
 						}
 					});
+					nodesInFrontier += frontier.size() - oldFrontier;
 //					System.out.println("Frontier has " + frontier.size() + " nodes after exploring");
 				}				
 			}
+			long endTime = System.currentTimeMillis();
+			
+			metrics.setTimeToSearch(endTime - startTime);
+			metrics.setNodesExplored(nodesExplored);
+			metrics.setNodesInFrontier(nodesInFrontier);
+			
 			System.out.println("ROUTE FOUND");
 			// Once we have found the goal, we then follow the path back to the start
 			
@@ -111,7 +137,11 @@ public class DecideByBFS implements DecisionFunction {
 		
 		Action a = new MoveToAction(t.agents.getFirst().pos.cpy(), next.getValue().cpy());
 		prm.visit(next);
-		return new Tuple<Action, TrackedGraph<Vector2>>(a, prm);
+		return new Tuple<>(metrics, new Tuple<>(a, prm));
+	}
+	
+	public String getName() {
+		return "Breadth First Search";
 	}
 
 }

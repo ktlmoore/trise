@@ -99,7 +99,8 @@ public class GridMap implements S13n {
 		}
 
 		Vector2 startPoint = env.agents.getFirst().pos.cpy();
-		Vector2 nearestPointToStart = points[(int) (startPoint.x / squareSize)][(int) (startPoint.y / squareSize)];
+		Vector2 nearestPointToStart = points[(int) Math.ceil(startPoint.x / squareSize)][(int) Math.ceil(startPoint.y / squareSize)];
+		System.out.println(String.format("Point: %d, %d", (int) (startPoint.x / squareSize), (int) (startPoint.y / squareSize)));
 		grid.addEdge(grid.findNode(startPoint), grid.findNode(nearestPointToStart));
 
 		for (StaticGoal g : env.goals) {

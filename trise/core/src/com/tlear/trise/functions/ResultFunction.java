@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
 import com.tlear.trise.interactions.Action;
 import com.tlear.trise.interactions.MoveToAction;
+import com.tlear.trise.interactions.NoAction;
 import com.tlear.trise.utils.Tuple;
 
 public class ResultFunction implements BiFunction<Action, Environment, Tuple<Environment, Integer>> {
@@ -14,6 +15,9 @@ public class ResultFunction implements BiFunction<Action, Environment, Tuple<Env
 	public Tuple<Environment, Integer> apply(Action t, Environment u) {
 		if (t instanceof MoveToAction) {
 			return resolve((MoveToAction) t, u);
+		}
+		if (t instanceof NoAction) {
+			return resolve((NoAction) t, u);
 		}
 		return null;
 	}
@@ -30,4 +34,7 @@ public class ResultFunction implements BiFunction<Action, Environment, Tuple<Env
 		return new Tuple<Environment, Integer>(newEnv, Math.max(t, 1));
 	}
 	
+	public Tuple<Environment, Integer> resolve(NoAction act, Environment env) {
+		return new Tuple<>(env, 1);
+	}
 }

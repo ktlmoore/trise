@@ -14,6 +14,7 @@ import com.tlear.trise.environment.Environment;
 import com.tlear.trise.graph.Edge;
 import com.tlear.trise.graph.Node;
 import com.tlear.trise.graph.TrackedGraph;
+import com.tlear.trise.metrics.ImmutableMetrics;
 import com.tlear.trise.objects.Agent;
 import com.tlear.trise.objects.EnvObject;
 import com.tlear.trise.objects.StaticGoal;
@@ -29,11 +30,15 @@ public class Simulation {
 	private TrackedGraph<Vector2> g;
 
 	private TRISE parent;
+	
+	private String infoText;
 
 	public EnvObject selectedObject;
 
 	public Simulation(TRISE parent) {
 		this.parent = parent;
+		
+		infoText = "";
 
 		createSim();
 
@@ -122,16 +127,33 @@ public class Simulation {
 		font.draw(batch, parent.modeEdit ? "EDIT" : "", Gdx.graphics.getWidth() * 9 / 10, 100);
 		font.draw(batch, parent.modeSim ? "SIMULATING" : "", Gdx.graphics.getWidth() * 9 / 10, 150);
 		font.draw(batch, parent.modeNewObject ? "NEW OBJECT" : "", Gdx.graphics.getWidth() * 9 / 10, 200);
+		int bottom = 250;
+		int left = Gdx.graphics.getWidth() * 8/10;
+		for (Agent agent : env.agents) {
+			ImmutableMetrics metrics = agent.getMetrics();
+			String text = "";
+			text += metrics.isSet(metrics.getNodesExplored()) ? String.format("Nodes explored: \n%d\n", metrics.getNodesExplored()) : "";
+			text += metrics.isSet(metrics.getNodesInFrontier()) ? String.format("Nodes in frontier: \n%d\n", metrics.getNodesInFrontier()) : "";
+			text += metrics.isSet(metrics.getTimeToSkeletonise()) ? String.format("Time to skeletonise: \n%dms\n", metrics.getTimeToSkeletonise()) : "";
+			text += metrics.isSet(metrics.getTimeToSearch()) ? String.format("Time to search: \n%dms\n", metrics.getTimeToSearch()) : "";
+			text += metrics.isSet(metrics.getTimeToReachGoal()) ? String.format("Time to reach goal: \n%dms\n", metrics.getTimeToReachGoal()) : "";
+			font.drawMultiLine(batch, text, left, bottom);
+		}
+		font.draw(batch, String.format("\n%s\n", infoText), Gdx.graphics.getHeight() * 9 / 10, 50);
 		batch.end();
 	}
 
+	/**
+	 * Returns which, if any, object contains this point
+	 * @param pos
+	 * @return
+	 */
 	public EnvObject getObjectContainingPoint(Vector2 pos) {
-		// Returns the environment object that this position contains
-		// for (Agent a : env.agents) {
-		// if (a.containsPoint(pos)) {
-		// return a;
-		// }
-		// }
+		for (Agent a : env.agents) {
+			if (a.containsPoint(pos)) {
+				return a;
+			}
+		}
 		for (StaticObstacle o : env.obstacles) {
 			if (o.containsPoint(pos)) {
 				return o;
@@ -238,5 +260,13 @@ public class Simulation {
 		}
 
 		dirtyEnvironment();
+	}
+	
+	/**
+	 * Set the info text to be displayed currently.
+	 * @param text
+	 */
+	public void setInfoText(String text) {
+		infoText = text;
 	}
 }

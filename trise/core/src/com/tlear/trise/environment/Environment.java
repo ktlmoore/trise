@@ -34,7 +34,7 @@ public class Environment {
 		obstacles = new LinkedList<StaticObstacle>();
 		goals = new LinkedList<StaticGoal>();
 
-		maxX = Gdx.graphics.getWidth();
+		maxX = Gdx.graphics.getWidth() - 200;
 		maxY = Gdx.graphics.getHeight();
 
 		dirty = false;

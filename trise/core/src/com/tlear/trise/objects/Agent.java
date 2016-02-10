@@ -5,23 +5,26 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.tlear.trise.environment.Environment;
+import com.tlear.trise.functions.BooleanIsGoalFunction;
 import com.tlear.trise.functions.DistanceToGoalHeuristicFunction;
 import com.tlear.trise.functions.GoalFunction;
-import com.tlear.trise.functions.MultipleGoalsGoalFunction;
 import com.tlear.trise.functions.ResultFunction;
 import com.tlear.trise.functions.decision.DecideByAStarSearch;
+import com.tlear.trise.functions.decision.DecideByBFS;
+import com.tlear.trise.functions.decision.DecideByRandomPRM;
+import com.tlear.trise.functions.decision.DecideByUCS;
 import com.tlear.trise.functions.decision.DecisionFunction;
 import com.tlear.trise.graph.TrackedGraph;
 import com.tlear.trise.interactions.Action;
 import com.tlear.trise.interactions.Actuator;
 import com.tlear.trise.interactions.Sensor;
+import com.tlear.trise.metrics.ImmutableMetrics;
+import com.tlear.trise.metrics.MutableMetrics;
 import com.tlear.trise.utils.Triple;
 import com.tlear.trise.utils.Tuple;
 
@@ -38,19 +41,13 @@ public class Agent extends DynamicObject {
 	private GoalFunction goal;
 	private DecisionFunction decide;
 	private Environment belief;
-
-	private int theta = 0;
+	
+	private MutableMetrics metrics;
 
 	private float speed;
 
-	private Texture img;
-	private TextureRegion tex;
-
 	public Agent(float x, float y, float width, float height, Environment env) {
 		super(x, y, width, height);
-
-		img = new Texture("benhead.png");
-		tex = new TextureRegion(img);
 
 		/*
 		 * Add the initial state to the start of our list of keyframes
@@ -64,14 +61,16 @@ public class Agent extends DynamicObject {
 		actuators = new HashSet<Actuator>();
 
 		result = new ResultFunction();
-		// goal = new BooleanIsGoalFunction();
-		goal = new MultipleGoalsGoalFunction();
+		goal = new BooleanIsGoalFunction();
+		//goal = new MultipleGoalsGoalFunction();
 		decide = new DecideByAStarSearch(goal, new DistanceToGoalHeuristicFunction(env));
 		// decide = new DecideByUCS(goal);
 
 		belief = new Environment();
 
 		speed = 3.0f;
+		
+		metrics = new MutableMetrics();
 
 		beliefKeyframes.put(0, this.copy());
 		actualKeyframes.put(0, this.copy());
@@ -89,6 +88,8 @@ public class Agent extends DynamicObject {
 		this.decide = that.decide;
 		this.belief = new Environment(that.belief);
 		this.speed = that.speed;
+		
+		this.metrics = that.metrics;
 
 		this.lastKeyframe = that.lastKeyframe;
 	}
@@ -101,16 +102,17 @@ public class Agent extends DynamicObject {
 
 		belief = env;
 		if (belief.dirty) {
-			decide = new DecideByAStarSearch(goal, new DistanceToGoalHeuristicFunction(env));
+			//decide = new DecideByAStarSearch(goal, new DistanceToGoalHeuristicFunction(env));
 			belief.clean();
 		}
 
 		/*
 		 * Determine the action to take
 		 */
-		Tuple<Action, TrackedGraph<Vector2>> decision = decide.apply(belief);
-		Action act = decision.fst;
-		TrackedGraph<Vector2> g = decision.snd;
+		Tuple<MutableMetrics, Tuple<Action, TrackedGraph<Vector2>>> decision = decide.apply(belief);
+		metrics = decision.fst;
+		Action act = decision.snd.fst;
+		TrackedGraph<Vector2> g = decision.snd.snd;
 
 		/*
 		 * Estimate what will happen when we take that action
@@ -222,6 +224,34 @@ public class Agent extends DynamicObject {
 
 	public Agent copy() {
 		return new Agent(this);
+	}
+	
+	public ImmutableMetrics getMetrics() {
+		return new ImmutableMetrics(metrics);
+	}
+	
+	public DecisionFunction getDecisionFunction() {
+		return decide;
+	}
+	
+	public void nextDecisionFunction() {
+		System.out.println("Cycling decision function...");
+		if (decide instanceof DecideByRandomPRM) {
+			decide = new DecideByBFS(goal);
+			return;
+		}
+		if (decide instanceof DecideByBFS) {
+			decide = new DecideByUCS(goal);
+			return;
+		}
+		if (decide instanceof DecideByUCS) {
+			decide = new DecideByAStarSearch(goal, new DistanceToGoalHeuristicFunction(belief));
+			return;
+		}
+		if (decide instanceof DecideByAStarSearch) {
+			decide = new DecideByRandomPRM();
+			return;
+		} 
 	}
 
 }

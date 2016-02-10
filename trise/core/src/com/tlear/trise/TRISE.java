@@ -4,15 +4,14 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.tlear.trise.objects.Agent;
 import com.tlear.trise.objects.EnvObject;
 
 public class TRISE extends ApplicationAdapter {
 	SpriteBatch batch;
-	Texture img;
 	ShapeRenderer sr;
 	Simulation sim;
 
@@ -27,13 +26,13 @@ public class TRISE extends ApplicationAdapter {
 
 	@Override
 	public void create() {
+		
 		d = 0;
 		frames = 1;
 
 		sim = new Simulation(this);
 
 		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
 		sr = new ShapeRenderer();
 	}
 
@@ -77,20 +76,36 @@ public class TRISE extends ApplicationAdapter {
 		if (Gdx.input.isKeyJustPressed(Keys.R)) {
 			reset();
 		}
-		if (modeEdit) {
-			// Deal with mouse presses
-			if (Gdx.input.justTouched()) {
+		// Deal with mouse presses
+		if (Gdx.input.justTouched()) {
 
-				// First get the touch position
-				Vector2 touchPosition = new Vector2(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+			// First get the touch position
+			Vector2 touchPosition = new Vector2(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
 
-				// Then work out what it was that we just touched
-				EnvObject obj = sim.getObjectContainingPoint(touchPosition);
-				if (obj != null) {
-					System.out.println(obj.toString());
-					sim.selectEnvObject(obj);
+			// Then work out what it was that we just touched
+			EnvObject obj = sim.getObjectContainingPoint(touchPosition);
+			if (obj != null) {
+				System.out.println(obj.toString());
+				sim.selectEnvObject(obj);
+				if (obj instanceof Agent) {
+					sim.setInfoText(String.format("%s.  Decision Function: %s", obj.toString(), ((Agent) obj).getDecisionFunction().getName()));
+				} else {
+					sim.setInfoText(obj.toString());
+				}
+				
+			}
+		}
+		// Deal with non-edit-mode selected item keypresses
+		if (sim.selectedObject != null) {
+			// For cycling through decision functions for a selected Agent
+			if (sim.selectedObject instanceof Agent) {
+				if (Gdx.input.isKeyJustPressed(Keys.D)) {
+					((Agent) sim.selectedObject).nextDecisionFunction();
+					sim.setInfoText(String.format("%s.  Decision Function: %s", sim.selectedObject.toString(), ((Agent) sim.selectedObject).getDecisionFunction().getName()));
 				}
 			}
+		}
+		if (modeEdit) {
 
 			// For adding new objects
 			if (Gdx.input.isKeyJustPressed(Keys.N)) {
@@ -127,6 +142,8 @@ public class TRISE extends ApplicationAdapter {
 				if (Gdx.input.isKeyJustPressed(Keys.DEL) || Gdx.input.isKeyJustPressed(Keys.BACKSPACE)) {
 					sim.deleteObject(sim.selectedObject);
 				}
+				
+				
 			}
 		}
 	}
