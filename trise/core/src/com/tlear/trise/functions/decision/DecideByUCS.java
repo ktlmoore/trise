@@ -163,4 +163,8 @@ public class DecideByUCS implements DecisionFunction {
 	public String getName() {
 		return "Uniform Cost Search";
 	}
+	
+	public String getS13nName() {
+		return "Bridsons PRM";
+	}
 }

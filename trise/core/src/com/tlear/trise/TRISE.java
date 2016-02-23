@@ -87,21 +87,24 @@ public class TRISE extends ApplicationAdapter {
 			if (obj != null) {
 				System.out.println(obj.toString());
 				sim.selectEnvObject(obj);
-				if (obj instanceof Agent) {
-					sim.setInfoText(String.format("%s.  Decision Function: %s", obj.toString(), ((Agent) obj).getDecisionFunction().getName()));
-				} else {
-					sim.setInfoText(obj.toString());
-				}
+				sim.setInfoText(String.format("%s", obj.toString()));
 				
 			}
 		}
 		// Deal with non-edit-mode selected item keypresses
 		if (sim.selectedObject != null) {
-			// For cycling through decision functions for a selected Agent
+			// For agent changing functions
 			if (sim.selectedObject instanceof Agent) {
 				if (Gdx.input.isKeyJustPressed(Keys.D)) {
 					((Agent) sim.selectedObject).nextDecisionFunction();
-					sim.setInfoText(String.format("%s.  Decision Function: %s", sim.selectedObject.toString(), ((Agent) sim.selectedObject).getDecisionFunction().getName()));
+					sim.setInfoText(String.format("%s", sim.selectedObject.toString()));
+				}
+				if (Gdx.input.isKeyJustPressed(Keys.G)) {
+					((Agent) sim.selectedObject).nextSkeletonisationFunction();
+					sim.setInfoText(String.format("%s", sim.selectedObject.toString()));
+				}
+				if (Gdx.input.isKeyJustPressed(Keys.H)) {
+					sim.editHeuristic();
 				}
 			}
 		}

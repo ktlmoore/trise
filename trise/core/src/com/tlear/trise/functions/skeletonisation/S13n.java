@@ -10,4 +10,6 @@ public interface S13n {
 	 * Takes an environment and constructs a skeletonisation based on it
 	 */
 	public TrackedGraph<Vector2> skeletonise(Environment env);
+	
+	public String getName();
 }

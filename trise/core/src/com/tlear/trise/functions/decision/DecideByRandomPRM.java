@@ -59,4 +59,8 @@ public class DecideByRandomPRM implements DecisionFunction {
 		return "Random PRM";
 	}
 	
+	public String getS13nName() {
+		return "PRM";
+	}
+	
 }

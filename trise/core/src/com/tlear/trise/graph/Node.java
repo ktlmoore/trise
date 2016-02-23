@@ -7,17 +7,20 @@ public class Node<T> {
 
 	@Override
 	public String toString() {
-		return "Node [value=" + value + ", numberOfNeighbours: " + neighbours.size() + "]";
+		return "Node [value=" + value + ", numberOfNeighbours: "
+				+ neighbours.size() + ", g(x)=" + distanceTo + "]";
 	}
 
 	private List<Node<T>> neighbours;
 	private T value;
-	
+	private double distanceTo;
+
 	public Node(T value) {
 		this.value = value;
 		neighbours = new LinkedList<Node<T>>();
+		distanceTo = Integer.MAX_VALUE;
 	}
-	
+
 	@Override
 	public boolean equals(Object that) {
 		if (that == null) {
@@ -33,37 +36,50 @@ public class Node<T> {
 		if (!thatNode.neighbours.equals(neighbours)) {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	public Node(Node<T> that) {
 		this.value = that.value;
 		this.neighbours = new LinkedList<Node<T>>(that.neighbours);
 	}
-	
+
 	public int addNeighbour(Node<T> n) {
 		neighbours.add(n);
 		return neighbours.size();
 	}
-	
+
 	public boolean deleteNeighbour(Node<T> n) {
 		return neighbours.remove(n);
 	}
-	
+
 	public List<Node<T>> getNeighbours() {
 		return new LinkedList<>(neighbours);
 	}
-	
+
 	public int numberOfNeighbours() {
 		return neighbours.size();
 	}
-	
+
 	public T getValue() {
 		return value;
 	}
-	
+
 	public void setValue(T val) {
 		this.value = val;
+	}
+
+	public boolean updateDistanceTo(float newDistance) {
+		if (newDistance < distanceTo) {
+			distanceTo = newDistance;
+			return true;
+		}
+		return false;
+
+	}
+
+	public double getDistanceTo() {
+		return distanceTo;
 	}
 }

@@ -136,4 +136,8 @@ public class BridsonsPRM extends ProbabilisticRoadMap {
 		// Returning sp - sq will give us which is further away
 		return (int) ((p.cpy().sub(s).len() - q.cpy().sub(s).len()));
 	}
+	
+	public String getName() {
+		return "Bridson's Algorithm PRM";
+	}
 }

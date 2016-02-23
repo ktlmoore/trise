@@ -30,14 +30,14 @@ public class Simulation {
 	private TrackedGraph<Vector2> g;
 
 	private TRISE parent;
-	
+
 	private String infoText;
 
 	public EnvObject selectedObject;
 
 	public Simulation(TRISE parent) {
 		this.parent = parent;
-		
+
 		infoText = "";
 
 		createSim();
@@ -47,7 +47,8 @@ public class Simulation {
 
 		time = 0;
 
-		Triple<Integer, Integer, TrackedGraph<Vector2>> next = env.getNextKeyframe(timeMap);
+		Triple<Integer, Integer, TrackedGraph<Vector2>> next = env
+				.getNextKeyframe(timeMap);
 		timeMap.put(next.fst, next.snd);
 		g = next.thd;
 
@@ -76,7 +77,8 @@ public class Simulation {
 		if (timeMap.get(nextKeyframe) == time) {
 			prevKeyframe = nextKeyframe;
 
-			Triple<Integer, Integer, TrackedGraph<Vector2>> next = env.getNextKeyframe(timeMap);
+			Triple<Integer, Integer, TrackedGraph<Vector2>> next = env
+					.getNextKeyframe(timeMap);
 			timeMap.put(next.fst, next.snd);
 			g = next.thd;
 
@@ -124,27 +126,40 @@ public class Simulation {
 		batch.begin();
 		// font.draw(batch, (float) (100 * g.getExploredNodes().size() /
 		// g.getNodes().size()) + "%", 600, 50);
-		font.draw(batch, parent.modeEdit ? "EDIT" : "", Gdx.graphics.getWidth() * 9 / 10, 100);
-		font.draw(batch, parent.modeSim ? "SIMULATING" : "", Gdx.graphics.getWidth() * 9 / 10, 150);
-		font.draw(batch, parent.modeNewObject ? "NEW OBJECT" : "", Gdx.graphics.getWidth() * 9 / 10, 200);
+		font.draw(batch, parent.modeEdit ? "EDIT" : "",
+				Gdx.graphics.getWidth() * 9 / 10, 100);
+		font.draw(batch, parent.modeSim ? "SIMULATING" : "",
+				Gdx.graphics.getWidth() * 9 / 10, 150);
+		font.draw(batch, parent.modeNewObject ? "NEW OBJECT" : "",
+				Gdx.graphics.getWidth() * 9 / 10, 200);
 		int bottom = 250;
-		int left = Gdx.graphics.getWidth() * 8/10;
+		int left = Gdx.graphics.getWidth() * 8 / 10;
 		for (Agent agent : env.agents) {
 			ImmutableMetrics metrics = agent.getMetrics();
 			String text = "";
-			text += metrics.isSet(metrics.getNodesExplored()) ? String.format("Nodes explored: \n%d\n", metrics.getNodesExplored()) : "";
-			text += metrics.isSet(metrics.getNodesInFrontier()) ? String.format("Nodes in frontier: \n%d\n", metrics.getNodesInFrontier()) : "";
-			text += metrics.isSet(metrics.getTimeToSkeletonise()) ? String.format("Time to skeletonise: \n%dms\n", metrics.getTimeToSkeletonise()) : "";
-			text += metrics.isSet(metrics.getTimeToSearch()) ? String.format("Time to search: \n%dms\n", metrics.getTimeToSearch()) : "";
-			text += metrics.isSet(metrics.getTimeToReachGoal()) ? String.format("Time to reach goal: \n%dms\n", metrics.getTimeToReachGoal()) : "";
+			text += metrics.isSet(metrics.getNodesExplored()) ? String.format(
+					"Nodes explored: \n%d\n", metrics.getNodesExplored()) : "";
+			text += metrics.isSet(metrics.getNodesInFrontier()) ? String
+					.format("Nodes in frontier: \n%d\n",
+							metrics.getNodesInFrontier()) : "";
+			text += metrics.isSet(metrics.getTimeToSkeletonise()) ? String
+					.format("Time to skeletonise: \n%dms\n",
+							metrics.getTimeToSkeletonise()) : "";
+			text += metrics.isSet(metrics.getTimeToSearch()) ? String.format(
+					"Time to search: \n%dms\n", metrics.getTimeToSearch()) : "";
+			text += metrics.isSet(metrics.getTimeToReachGoal()) ? String
+					.format("Time to reach goal: \n%dms\n",
+							metrics.getTimeToReachGoal()) : "";
 			font.drawMultiLine(batch, text, left, bottom);
 		}
-		font.draw(batch, String.format("\n%s\n", infoText), Gdx.graphics.getHeight() * 9 / 10, 50);
+		font.draw(batch, String.format("\n%s\n", infoText),
+				Gdx.graphics.getHeight() * 9 / 10, 50);
 		batch.end();
 	}
 
 	/**
 	 * Returns which, if any, object contains this point
+	 * 
 	 * @param pos
 	 * @return
 	 */
@@ -170,7 +185,8 @@ public class Simulation {
 	public void selectEnvObject(EnvObject obj) {
 		// Pre: obj != null
 		if (obj == null) {
-			throw new NullPointerException("Object to be selected must not be null!!!");
+			throw new NullPointerException(
+					"Object to be selected must not be null!!!");
 		}
 		if (!obj.selected) {
 			obj.select();
@@ -234,7 +250,8 @@ public class Simulation {
 		} else if (obj instanceof StaticGoal) {
 			env.goals.remove(obj);
 		} else {
-			throw new RuntimeException("Could not delete object from simulation");
+			throw new RuntimeException(
+					"Could not delete object from simulation");
 		}
 
 	}
@@ -244,26 +261,37 @@ public class Simulation {
 			System.out.println("NOT YET IMPLEMENTED");
 
 		} else if (obstacle) {
-			StaticObstacle o = new StaticObstacle(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), 50, 50);
+			StaticObstacle o = new StaticObstacle(Gdx.input.getX(),
+					Gdx.graphics.getHeight() - Gdx.input.getY(), 50, 50);
 			env.placeObstacle(o);
 		} else if (goal) {
-			Vector2 mousePos = new Vector2(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+			Vector2 mousePos = new Vector2(Gdx.input.getX(),
+					Gdx.graphics.getHeight() - Gdx.input.getY());
 			for (StaticObstacle o : env.obstacles) {
 				if (o.containsPoint(mousePos)) {
 					System.out.println("COULD NOT PLACE GOAL IN OBSTACLE");
 					return;
 				}
 			}
-			StaticGoal g = new StaticGoal(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY(), 20, 20);
+			StaticGoal g = new StaticGoal(Gdx.input.getX(),
+					Gdx.graphics.getHeight() - Gdx.input.getY(), 20, 20);
 			env.placeGoal(g);
 
 		}
 
 		dirtyEnvironment();
 	}
-	
+
+	public void editHeuristic() {
+		HeuristicTextListener listener = new HeuristicTextListener(
+				env.agents.getFirst());
+		Gdx.input.getTextInput(listener, "Enter new heuristic", "",
+				"Enter function");
+	}
+
 	/**
 	 * Set the info text to be displayed currently.
+	 * 
 	 * @param text
 	 */
 	public void setInfoText(String text) {

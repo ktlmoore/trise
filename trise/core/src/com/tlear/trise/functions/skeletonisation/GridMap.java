@@ -111,4 +111,8 @@ public class GridMap implements S13n {
 
 		return grid;
 	}
+	
+	public String getName() {
+		return "Grid Map";
+	}
 }

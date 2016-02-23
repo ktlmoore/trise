@@ -131,4 +131,8 @@ public class ProbabilisticRoadMap implements S13n {
 		}
 		throw new RuntimeException("ERROR");
 	}
+	
+	public String getName() {
+		return "Probabilistic Road Map";
+	}
 }

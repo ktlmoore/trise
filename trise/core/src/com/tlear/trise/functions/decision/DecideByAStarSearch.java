@@ -14,6 +14,7 @@ import com.tlear.trise.environment.Environment;
 import com.tlear.trise.functions.GoalFunction;
 import com.tlear.trise.functions.HeuristicFunction;
 import com.tlear.trise.functions.skeletonisation.GridMap;
+import com.tlear.trise.functions.skeletonisation.ProbabilisticRoadMap;
 import com.tlear.trise.functions.skeletonisation.S13n;
 import com.tlear.trise.graph.Node;
 import com.tlear.trise.graph.TrackedGraph;
@@ -96,6 +97,7 @@ public class DecideByAStarSearch implements DecisionFunction {
 			
 			System.out.println("Skeletonising environment...");
 			
+			prm = new TrackedUndirectedGraph<>();
 			// Skeletonise (and timestamp the ends)
 			long startTime = System.currentTimeMillis();
 			prm = map.skeletonise(t);
@@ -223,6 +225,23 @@ public class DecideByAStarSearch implements DecisionFunction {
 	
 	public String getName() {
 		return "A* Search";
+	}
+	
+	public String getS13nName() {
+		return map.getName();
+	}
+	
+	public void nextS13nFunction() {
+		if (map instanceof GridMap) {
+			map = new ProbabilisticRoadMap(1000, 5);
+			initialised = false;
+			return;
+		}
+		if (map instanceof ProbabilisticRoadMap) {
+			map = new GridMap(25);
+			initialised = false;
+			return;
+		}
 	}
 
 }

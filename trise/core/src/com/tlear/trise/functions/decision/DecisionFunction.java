@@ -17,5 +17,7 @@ public interface DecisionFunction extends Function<Environment, Tuple<MutableMet
 	public Tuple<MutableMetrics, Tuple<Action, TrackedGraph<Vector2>>> apply(Environment t);
 	
 	public String getName();
+	
+	public String getS13nName();
 }
  

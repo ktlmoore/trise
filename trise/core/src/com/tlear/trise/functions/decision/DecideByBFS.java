@@ -16,6 +16,7 @@ import com.tlear.trise.graph.TrackedGraph;
 import com.tlear.trise.graph.TrackedUndirectedGraph;
 import com.tlear.trise.interactions.Action;
 import com.tlear.trise.interactions.MoveToAction;
+import com.tlear.trise.interactions.NoAction;
 import com.tlear.trise.metrics.MutableMetrics;
 import com.tlear.trise.utils.Tuple;
 
@@ -36,6 +37,8 @@ public class DecideByBFS implements DecisionFunction {
 	
 	private MutableMetrics metrics;
 	
+	private boolean atGoal;
+	
 	private boolean initialised;
 	
 	public DecideByBFS(GoalFunction goal) {
@@ -46,14 +49,16 @@ public class DecideByBFS implements DecisionFunction {
 		this.goal = goal;
 		pathBack = new HashMap<Node<Vector2>, Node<Vector2>>();
 		explored = new HashSet<Node<Vector2>>();
-		
+		atGoal = false;
 		metrics = new MutableMetrics();
 	}
 	
 	@Override
 	public Tuple<MutableMetrics, Tuple<Action, TrackedGraph<Vector2>>> apply(Environment t) {
 		
-		System.out.println("APPLYING");
+		if (!atGoal) {			
+			System.out.println("APPLYING");
+		}
 		if (!initialised) {
 			metrics.reset();
 			pathBack = new HashMap<Node<Vector2>, Node<Vector2>>();
@@ -64,16 +69,20 @@ public class DecideByBFS implements DecisionFunction {
 			long endTime = System.currentTimeMillis();
 			
 			metrics.setTimeToSkeletonise(endTime - startTime);
-			
+			atGoal = false;
 			initialised = true;
 		}
 			
-		if (path.size() <= 0) {
+		if (path.size() <= 0 && !atGoal) {
 			frontier = new LinkedList<>();
 			explored = new HashSet<Node<Vector2>>();
 			pathBack = new HashMap<Node<Vector2>, Node<Vector2>>();
 			Node<Vector2> startNode = prm.findNode(t.agents.getFirst().pos);
 			frontier.add(startNode);
+			
+			if (goal.apply(t, startNode)) {
+				atGoal = true;
+			}
 		
 			Node<Vector2> goalNode = null;
 			System.out.println("SEARCHING");
@@ -130,18 +139,27 @@ public class DecideByBFS implements DecisionFunction {
 			
 		
 		
-		Node<Vector2> next = path.remove(0);
-		if (next == null) {
-			next = new Node<Vector2>(t.agents.getFirst().pos.cpy());
-		}
 		
-		Action a = new MoveToAction(t.agents.getFirst().pos.cpy(), next.getValue().cpy());
-		prm.visit(next);
-		return new Tuple<>(metrics, new Tuple<>(a, prm));
+		if (!atGoal) {
+			Node<Vector2> next = path.remove(0);
+			if (next == null) {
+				next = new Node<Vector2>(t.agents.getFirst().pos.cpy());
+			}
+			Action a = new MoveToAction(t.agents.getFirst().pos.cpy(), next.getValue().cpy());
+			prm.visit(next);
+			
+			return new Tuple<>(metrics, new Tuple<>(a, prm));
+		} else {
+			return new Tuple<>(metrics, new Tuple<>(new NoAction(), prm));
+		}
 	}
 	
 	public String getName() {
 		return "Breadth First Search";
+	}
+	
+	public String getS13nName() {
+		return "PRM";
 	}
 
 }

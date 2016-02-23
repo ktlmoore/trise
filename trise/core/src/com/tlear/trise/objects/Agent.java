@@ -2,6 +2,7 @@ package com.tlear.trise.objects;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,46 +42,100 @@ public class Agent extends DynamicObject {
 	private GoalFunction goal;
 	private DecisionFunction decide;
 	private Environment belief;
-	
+
 	private MutableMetrics metrics;
 
 	private float speed;
 
+	/**
+	 * Construct an agent at position (x, y) with the given width and height,
+	 * and add it to the environment.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @param env
+	 */
 	public Agent(float x, float y, float width, float height, Environment env) {
 		super(x, y, width, height);
 
 		/*
-		 * Add the initial state to the start of our list of keyframes
+		 * Add the initial state to the start of our list of keyframes for this
+		 * agent
 		 */
 		beliefKeyframes = new LinkedHashMap<Integer, Agent>();
 		actualKeyframes = new LinkedHashMap<Integer, Agent>();
 
+		/*
+		 * The most recently used keyframe
+		 */
 		lastKeyframe = 0;
 
+		/*
+		 * The set of sensors that the agent can consult
+		 */
 		sensors = new HashSet<Sensor>();
+
+		/*
+		 * The set of actuators that the agent can use to move
+		 */
 		actuators = new HashSet<Actuator>();
 
+		/*
+		 * The function we use to predict the result of our action
+		 */
 		result = new ResultFunction();
+
+		/*
+		 * The function to determine whether a given node is a goal
+		 */
 		goal = new BooleanIsGoalFunction();
-		//goal = new MultipleGoalsGoalFunction();
-		decide = new DecideByAStarSearch(goal, new DistanceToGoalHeuristicFunction(env));
+		// goal = new MultipleGoalsGoalFunction();
+
+		/*
+		 * The function to make a decision on what to do next given a current
+		 * location
+		 */
+		decide = new DecideByAStarSearch(goal,
+				new DistanceToGoalHeuristicFunction(env));
 		// decide = new DecideByUCS(goal);
 
+		/*
+		 * An environment describing what the agent believes of the environment
+		 */
 		belief = new Environment();
 
+		/*
+		 * How fast the agent moves.
+		 */
 		speed = 3.0f;
-		
+
+		/*
+		 * A metrics object tracking information we want to know about
+		 */
 		metrics = new MutableMetrics();
 
+		/*
+		 * Now we have defined the agent, we add it to the first keyframe for
+		 * both belief and actual
+		 */
 		beliefKeyframes.put(0, this.copy());
 		actualKeyframes.put(0, this.copy());
 	}
 
+	/**
+	 * Creates an agent that is a deep copy of another agent.
+	 * 
+	 * @param that
+	 */
 	public Agent(Agent that) {
 		super(that.pos.x, that.pos.y, that.width, that.height);
 
-		this.beliefKeyframes = new LinkedHashMap<Integer, Agent>(that.beliefKeyframes);
-		this.actualKeyframes = new LinkedHashMap<Integer, Agent>(that.actualKeyframes);
+		this.beliefKeyframes = new LinkedHashMap<Integer, Agent>(
+				that.beliefKeyframes);
+		this.actualKeyframes = new LinkedHashMap<Integer, Agent>(
+				that.actualKeyframes);
 		this.sensors = new HashSet<Sensor>(that.sensors);
 		this.actuators = new HashSet<Actuator>(that.actuators);
 		this.result = that.result;
@@ -88,28 +143,48 @@ public class Agent extends DynamicObject {
 		this.decide = that.decide;
 		this.belief = new Environment(that.belief);
 		this.speed = that.speed;
-		
+
 		this.metrics = that.metrics;
 
 		this.lastKeyframe = that.lastKeyframe;
 	}
 
+	/**
+	 * Returns the speed of the agent.
+	 * 
+	 * @return speed
+	 */
 	public float getSpeed() {
 		return speed;
 	}
 
-	public Triple<Environment, Tuple<Integer, Integer>, TrackedGraph<Vector2>> process(Environment env, Map<Integer, Integer> timeMap) {
+	/**
+	 * Given the current environment and map of times, computes a decision,
+	 * implements it as the decided course of action, and updates the belief
+	 * state with what is expected to happen.
+	 * 
+	 * @param env
+	 * @param timeMap
+	 * @return
+	 */
+	public Triple<Environment, Tuple<Integer, Integer>, TrackedGraph<Vector2>> process(
+			Environment env, Map<Integer, Integer> timeMap) {
 
+		// TEMPORARY: We currently update the belief state to be exactly what it
+		// is.
+		// Go on, let's fix this.
 		belief = env;
 		if (belief.dirty) {
-			//decide = new DecideByAStarSearch(goal, new DistanceToGoalHeuristicFunction(env));
+			// decide = new DecideByAStarSearch(goal, new
+			// DistanceToGoalHeuristicFunction(env));
 			belief.clean();
 		}
 
 		/*
 		 * Determine the action to take
 		 */
-		Tuple<MutableMetrics, Tuple<Action, TrackedGraph<Vector2>>> decision = decide.apply(belief);
+		Tuple<MutableMetrics, Tuple<Action, TrackedGraph<Vector2>>> decision = decide
+				.apply(belief);
 		metrics = decision.fst;
 		Action act = decision.snd.fst;
 		TrackedGraph<Vector2> g = decision.snd.snd;
@@ -134,14 +209,16 @@ public class Agent extends DynamicObject {
 		 * Update actual states based on what will actually happen
 		 */
 		env = actualResult.fst;
-		actualKeyframes.put(lastKeyframe + 1, actualResult.fst.agents.get(0).copy());
+		actualKeyframes.put(lastKeyframe + 1, actualResult.fst.agents.get(0)
+				.copy());
 
 		// System.out.println("ACTUAL KEYFRAMES " + actualKeyframes);
 
 		/*
 		 * Update keyframing
 		 */
-		Tuple<Integer, Integer> mapEntry = new Tuple<Integer, Integer>(lastKeyframe + 1, timeMap.get(lastKeyframe) + actualResult.snd);
+		Tuple<Integer, Integer> mapEntry = new Tuple<Integer, Integer>(
+				lastKeyframe + 1, timeMap.get(lastKeyframe) + actualResult.snd);
 		lastKeyframe++;
 
 		// System.out.println(actualKeyframes);
@@ -149,15 +226,18 @@ public class Agent extends DynamicObject {
 		/*
 		 * Return the updated environment and time map
 		 */
-		return new Triple<Environment, Tuple<Integer, Integer>, TrackedGraph<Vector2>>(env, mapEntry, g);
+		return new Triple<Environment, Tuple<Integer, Integer>, TrackedGraph<Vector2>>(
+				env, mapEntry, g);
 	}
 
 	@Override
 	public String toString() {
-		return "Agent [pos = " + pos.toString() + "]";
+		return String.format("Agent [pos = %s, decisionFn = %s, s13nFn = %s",
+				pos.toString(), decide.getName(), decide.getS13nName());
 	}
 
-	public void update(Map<Integer, Integer> timeMap, int prevKeyframe, int time, int nextKeyframe) {
+	public void update(Map<Integer, Integer> timeMap, int prevKeyframe,
+			int time, int nextKeyframe) {
 		/*
 		 * prevKeyframe = k-1 nextKeyframe = k
 		 * 
@@ -166,17 +246,27 @@ public class Agent extends DynamicObject {
 		 */
 
 		if (prevKeyframe >= nextKeyframe) {
-			throw new RuntimeException("Previous keyframe must be less than next keyframe");
+			throw new RuntimeException(
+					"Previous keyframe must be less than next keyframe");
 		}
 		if (prevKeyframe < 0) {
-			throw new RuntimeException("Trying to interpolate from a negative keyframe: " + prevKeyframe);
+			throw new RuntimeException(
+					"Trying to interpolate from a negative keyframe: "
+							+ prevKeyframe);
 		}
 		if (nextKeyframe > lastKeyframe) {
-			throw new RuntimeException("Trying to interpolate to a non-existent keyframe: " + nextKeyframe + ".  Most recent keyframe is " + lastKeyframe);
+			throw new RuntimeException(
+					"Trying to interpolate to a non-existent keyframe: "
+							+ nextKeyframe + ".  Most recent keyframe is "
+							+ lastKeyframe);
 		}
-		if (timeMap.get(prevKeyframe) > time || timeMap.get(nextKeyframe) < time) {
-			throw new RuntimeException("Trying to interpolate for a time outside the keyframe bounds: " + time + ".  Bounds are " + timeMap.get(prevKeyframe)
-					+ " and " + timeMap.get(nextKeyframe));
+		if (timeMap.get(prevKeyframe) > time
+				|| timeMap.get(nextKeyframe) < time) {
+			throw new RuntimeException(
+					"Trying to interpolate for a time outside the keyframe bounds: "
+							+ time + ".  Bounds are "
+							+ timeMap.get(prevKeyframe) + " and "
+							+ timeMap.get(nextKeyframe));
 		}
 
 		/*
@@ -225,15 +315,15 @@ public class Agent extends DynamicObject {
 	public Agent copy() {
 		return new Agent(this);
 	}
-	
+
 	public ImmutableMetrics getMetrics() {
 		return new ImmutableMetrics(metrics);
 	}
-	
+
 	public DecisionFunction getDecisionFunction() {
 		return decide;
 	}
-	
+
 	public void nextDecisionFunction() {
 		System.out.println("Cycling decision function...");
 		if (decide instanceof DecideByRandomPRM) {
@@ -245,13 +335,25 @@ public class Agent extends DynamicObject {
 			return;
 		}
 		if (decide instanceof DecideByUCS) {
-			decide = new DecideByAStarSearch(goal, new DistanceToGoalHeuristicFunction(belief));
+			decide = new DecideByAStarSearch(goal,
+					new DistanceToGoalHeuristicFunction(belief));
 			return;
 		}
 		if (decide instanceof DecideByAStarSearch) {
 			decide = new DecideByRandomPRM();
 			return;
-		} 
+		}
+	}
+
+	public void nextSkeletonisationFunction() {
+		System.out.println("Cycling s13n function...");
+		if (decide instanceof DecideByAStarSearch) {
+			((DecideByAStarSearch) decide).nextS13nFunction();
+		}
+	}
+
+	public void setHeuristic(List<String> functionAsList) {
+
 	}
 
 }
