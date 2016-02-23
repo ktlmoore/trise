@@ -1,5 +1,6 @@
 package com.tlear.trise;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -14,6 +15,8 @@ import com.tlear.trise.environment.Environment;
 import com.tlear.trise.graph.Edge;
 import com.tlear.trise.graph.Node;
 import com.tlear.trise.graph.TrackedGraph;
+import com.tlear.trise.interactions.OmniscientSensor;
+import com.tlear.trise.interactions.Sensor;
 import com.tlear.trise.metrics.ImmutableMetrics;
 import com.tlear.trise.objects.Agent;
 import com.tlear.trise.objects.EnvObject;
@@ -223,7 +226,10 @@ public class Simulation {
 		StaticGoal g = new StaticGoal(450, 450, 20, 20);
 		env.placeGoal(g);
 
-		Agent a = new Agent(10, 10, 25, 25, env);
+		HashSet<Sensor> sensors = new HashSet<>();
+		sensors.add(new OmniscientSensor());
+
+		Agent a = new Agent(10, 10, 25, 25, env, sensors);
 		env.placeAgent(a);
 
 		// g = new StaticGoal(250, 250, 20, 20);

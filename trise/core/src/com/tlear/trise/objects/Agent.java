@@ -1,5 +1,6 @@
 package com.tlear.trise.objects;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ import com.tlear.trise.graph.TrackedGraph;
 import com.tlear.trise.interactions.Action;
 import com.tlear.trise.interactions.Actuator;
 import com.tlear.trise.interactions.Sensor;
+import com.tlear.trise.interactions.SensorManager;
 import com.tlear.trise.metrics.ImmutableMetrics;
 import com.tlear.trise.metrics.MutableMetrics;
 import com.tlear.trise.utils.Triple;
@@ -36,7 +38,7 @@ public class Agent extends DynamicObject {
 
 	private int lastKeyframe;
 
-	private Set<Sensor> sensors;
+	private SensorManager sensorManager;
 	private Set<Actuator> actuators;
 	private ResultFunction result;
 	private GoalFunction goal;
@@ -57,7 +59,8 @@ public class Agent extends DynamicObject {
 	 * @param height
 	 * @param env
 	 */
-	public Agent(float x, float y, float width, float height, Environment env) {
+	public Agent(float x, float y, float width, float height, Environment env,
+			Collection<Sensor> sensors) {
 		super(x, y, width, height);
 
 		/*
@@ -75,7 +78,7 @@ public class Agent extends DynamicObject {
 		/*
 		 * The set of sensors that the agent can consult
 		 */
-		sensors = new HashSet<Sensor>();
+		sensorManager = new SensorManager(sensors);
 
 		/*
 		 * The set of actuators that the agent can use to move
@@ -136,7 +139,7 @@ public class Agent extends DynamicObject {
 				that.beliefKeyframes);
 		this.actualKeyframes = new LinkedHashMap<Integer, Agent>(
 				that.actualKeyframes);
-		this.sensors = new HashSet<Sensor>(that.sensors);
+		this.sensorManager = new SensorManager(that.sensorManager);
 		this.actuators = new HashSet<Actuator>(that.actuators);
 		this.result = that.result;
 		this.goal = that.goal;
@@ -170,10 +173,15 @@ public class Agent extends DynamicObject {
 	public Triple<Environment, Tuple<Integer, Integer>, TrackedGraph<Vector2>> process(
 			Environment env, Map<Integer, Integer> timeMap) {
 
-		// TEMPORARY: We currently update the belief state to be exactly what it
-		// is.
-		// Go on, let's fix this.
-		belief = env;
+		/*
+		 * Belief is updated to be what the sensors make of the environment at
+		 * that point
+		 */
+		belief = sensorManager.apply(env);
+
+		/*
+		 * If something's happened to the belief state, we fix it.
+		 */
 		if (belief.dirty) {
 			// decide = new DecideByAStarSearch(goal, new
 			// DistanceToGoalHeuristicFunction(env));
@@ -345,6 +353,9 @@ public class Agent extends DynamicObject {
 		}
 	}
 
+	/*
+	 * Cycles skeletonisation function to the next one in the list.
+	 */
 	public void nextSkeletonisationFunction() {
 		System.out.println("Cycling s13n function...");
 		if (decide instanceof DecideByAStarSearch) {
@@ -352,6 +363,9 @@ public class Agent extends DynamicObject {
 		}
 	}
 
+	/*
+	 * Set the heuristic function to the one provided by the user.
+	 */
 	public void setHeuristic(List<String> functionAsList) {
 
 	}
