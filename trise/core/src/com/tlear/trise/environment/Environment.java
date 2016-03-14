@@ -24,11 +24,19 @@ public class Environment {
 
 	public boolean dirty;
 
+	/**
+	 * String representation of an environment.
+	 */
 	@Override
 	public String toString() {
-		return "Environment [maxX=" + maxX + ", maxY=" + maxY + ", agents=" + agents + ", obstacles=" + obstacles + ", goals=" + goals + "]";
+		return "Environment [maxX=" + maxX + ", maxY=" + maxY + ", agents="
+				+ agents + ", obstacles=" + obstacles + ", goals=" + goals
+				+ "]";
 	}
 
+	/**
+	 * Creates a blank environment.
+	 */
 	public Environment() {
 		agents = new LinkedList<Agent>();
 		obstacles = new LinkedList<StaticObstacle>();
@@ -40,6 +48,12 @@ public class Environment {
 		dirty = false;
 	}
 
+	/**
+	 * Creates an empty environment with a given size.
+	 * 
+	 * @param maxX
+	 * @param maxY
+	 */
 	public Environment(int maxX, int maxY) {
 		agents = new LinkedList<Agent>();
 		obstacles = new LinkedList<StaticObstacle>();
@@ -51,6 +65,11 @@ public class Environment {
 		dirty = false;
 	}
 
+	/**
+	 * Creates this environment as a deep copy of another one.
+	 * 
+	 * @param that
+	 */
 	public Environment(Environment that) {
 		this.maxX = that.maxX;
 		this.maxY = that.maxY;
@@ -62,6 +81,12 @@ public class Environment {
 		dirty = false;
 	}
 
+	/**
+	 * Puts an agent in the environment.
+	 * 
+	 * @param a
+	 * @return
+	 */
 	public boolean placeAgent(Agent a) {
 		/*
 		 * We'll want to do some checking that we *can* place this agent
@@ -70,37 +95,68 @@ public class Environment {
 		return true;
 	}
 
+	/**
+	 * Puts an obstacle in the environment.
+	 * 
+	 * @param o
+	 * @return
+	 */
 	public boolean placeObstacle(StaticObstacle o) {
 		obstacles.add(o);
 		return true;
 	}
 
+	/**
+	 * Puts a goal in the environment.
+	 * 
+	 * @param g
+	 * @return
+	 */
 	public boolean placeGoal(StaticGoal g) {
 		goals.add(g);
 		return true;
 	}
 
 	/**
-	 * Generates the next keyframe
+	 * Works out the next keyframe position and time given the one we're
+	 * currently at.
 	 * 
 	 * @param timeMap
 	 */
-	public Triple<Integer, Integer, TrackedGraph<Vector2>> getNextKeyframe(Map<Integer, Integer> timeMap) {
+	public Triple<Integer, Integer, TrackedGraph<Vector2>> getNextKeyframe(
+			Map<Integer, Integer> timeMap) {
 
-		// System.out.println("GETTING NEXT KEYFRAME");
 		/*
-		 * we'll probably want to check that we are actually at the latest
-		 * keyframe
+		 * PRECONDITION: We are actually at a keyframe.
 		 */
 
-		Triple<Environment, Tuple<Integer, Integer>, TrackedGraph<Vector2>> nextKeyframe = agents.getFirst().process(this, timeMap);
-		// System.out.println("NEXT KEYFRAME: " + nextKeyframe);
+		/*
+		 * Calls "process" on the agent to get the details of the next key
+		 * frame.
+		 */
+		Triple<Environment, Tuple<Integer, Integer>, TrackedGraph<Vector2>> nextKeyframe = agents
+				.getFirst().process(this, timeMap);
 		Tuple<Integer, Integer> mapEntry = nextKeyframe.snd;
 
-		return new Triple<Integer, Integer, TrackedGraph<Vector2>>(mapEntry.fst, mapEntry.snd, nextKeyframe.thd);
+		/*
+		 * We return... er... something. Dammit, Tom, this is why we comment
+		 * things!
+		 */
+		return new Triple<Integer, Integer, TrackedGraph<Vector2>>(
+				mapEntry.fst, mapEntry.snd, nextKeyframe.thd);
 	}
 
-	public void update(Map<Integer, Integer> timeMap, int prevKeyframe, int time, int nextKeyframe) {
+	/**
+	 * Updates the environment with everything being where it should be given
+	 * the current time and the keyframes we are between.
+	 * 
+	 * @param timeMap
+	 * @param prevKeyframe
+	 * @param time
+	 * @param nextKeyframe
+	 */
+	public void update(Map<Integer, Integer> timeMap, int prevKeyframe,
+			int time, int nextKeyframe) {
 
 		/*
 		 * prevKeyframe = k-1 nextKeyframe = k
@@ -117,29 +173,44 @@ public class Environment {
 			throw new RuntimeException("Invalid time map " + timeMap.toString());
 		}
 		if (prevKeyframe >= nextKeyframe) {
-			throw new RuntimeException("Previous keyframe must be less than next keyframe");
+			throw new RuntimeException(
+					"Previous keyframe must be less than next keyframe");
 		}
 		if (prevKeyframe < 0) {
-			throw new RuntimeException("Trying to interpolate from a negative keyframe: " + prevKeyframe);
+			throw new RuntimeException(
+					"Trying to interpolate from a negative keyframe: "
+							+ prevKeyframe);
 		}
 		if (nextKeyframe > lastKeyframe) {
-			throw new RuntimeException("Trying to interpolate to a non-existent keyframe: " + nextKeyframe + ".  Most recent keyframe is " + lastKeyframe);
+			throw new RuntimeException(
+					"Trying to interpolate to a non-existent keyframe: "
+							+ nextKeyframe + ".  Most recent keyframe is "
+							+ lastKeyframe);
 		}
-		if (timeMap.get(prevKeyframe) > time || timeMap.get(nextKeyframe) < time) {
-			throw new RuntimeException("Trying to interpolate for a time outside the keyframe bounds: " + time + ".  Bounds are " + timeMap.get(prevKeyframe)
-					+ " and " + timeMap.get(nextKeyframe));
+		if (timeMap.get(prevKeyframe) > time
+				|| timeMap.get(nextKeyframe) < time) {
+			throw new RuntimeException(
+					"Trying to interpolate for a time outside the keyframe bounds: "
+							+ time + ".  Bounds are "
+							+ timeMap.get(prevKeyframe) + " and "
+							+ timeMap.get(nextKeyframe));
 		}
 
 		/*
-		 * Loop through agents
+		 * Loop through agents and update each of them
 		 */
-
 		for (Agent a : agents) {
 			a.update(timeMap, prevKeyframe, time, nextKeyframe);
 			// System.out.println(a);
 		}
 	}
 
+	/**
+	 * Draws everything in the environment.
+	 * 
+	 * @param sr
+	 * @param batch
+	 */
 	public void draw(ShapeRenderer sr, SpriteBatch batch) {
 		for (StaticObstacle o : obstacles) {
 			o.draw(sr, batch);
@@ -152,15 +223,27 @@ public class Environment {
 		}
 	}
 
+	/**
+	 * Finds the very last keyframe that we have any data for.
+	 * 
+	 * @param timeMap
+	 * @return
+	 */
 	private int findLastKeyframe(Map<Integer, Integer> timeMap) {
 		// Finds the last keyframe as the largest value in the keys of timeMap
 		return timeMap.keySet().stream().max((x, y) -> x - y).orElse(-1);
 	}
 
+	/**
+	 * Dirties the environment.
+	 */
 	public void dirty() {
 		dirty = true;
 	}
 
+	/**
+	 * Undirties the environment.
+	 */
 	public void clean() {
 		dirty = false;
 	}

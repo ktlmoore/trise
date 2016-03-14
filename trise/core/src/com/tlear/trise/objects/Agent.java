@@ -238,12 +238,25 @@ public class Agent extends DynamicObject {
 				env, mapEntry, g);
 	}
 
+	/**
+	 * Returns a string representation of this agent.
+	 */
 	@Override
 	public String toString() {
 		return String.format("Agent [pos = %s, decisionFn = %s, s13nFn = %s",
 				pos.toString(), decide.getName(), decide.getS13nName());
 	}
 
+	/**
+	 * Updates the position of the agent to the correctly interpolated point
+	 * given the keyframe to realtime mappings and the previous and next
+	 * keyframes.
+	 * 
+	 * @param timeMap
+	 * @param prevKeyframe
+	 * @param time
+	 * @param nextKeyframe
+	 */
 	public void update(Map<Integer, Integer> timeMap, int prevKeyframe,
 			int time, int nextKeyframe) {
 		/*
@@ -303,6 +316,12 @@ public class Agent extends DynamicObject {
 		// actualKeyframes);
 	}
 
+	/**
+	 * Draws the agent.
+	 * 
+	 * @param sr
+	 * @param batch
+	 */
 	public void draw(ShapeRenderer sr, SpriteBatch batch) {
 		// theta+=5;
 		// batch.begin();
@@ -320,18 +339,36 @@ public class Agent extends DynamicObject {
 		sr.end();
 	}
 
+	/**
+	 * Returns a deep copy of this agent.
+	 * 
+	 * @return
+	 */
 	public Agent copy() {
 		return new Agent(this);
 	}
 
+	/**
+	 * Returns the agent's metrics.
+	 * 
+	 * @return
+	 */
 	public ImmutableMetrics getMetrics() {
 		return new ImmutableMetrics(metrics);
 	}
 
+	/**
+	 * Returns the decision function that's being used.
+	 * 
+	 * @return
+	 */
 	public DecisionFunction getDecisionFunction() {
 		return decide;
 	}
 
+	/**
+	 * Cycles decision function to use the next one along
+	 */
 	public void nextDecisionFunction() {
 		System.out.println("Cycling decision function...");
 		if (decide instanceof DecideByRandomPRM) {
@@ -353,7 +390,7 @@ public class Agent extends DynamicObject {
 		}
 	}
 
-	/*
+	/**
 	 * Cycles skeletonisation function to the next one in the list.
 	 */
 	public void nextSkeletonisationFunction() {
@@ -363,8 +400,10 @@ public class Agent extends DynamicObject {
 		}
 	}
 
-	/*
+	/**
 	 * Set the heuristic function to the one provided by the user.
+	 * 
+	 * @param functionAsList
 	 */
 	public void setHeuristic(List<String> functionAsList) {
 
