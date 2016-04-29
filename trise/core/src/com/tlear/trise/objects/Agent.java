@@ -49,6 +49,23 @@ public class Agent extends DynamicObject {
 
 	private float speed;
 
+	public void reset() {
+		Agent init = beliefKeyframes.get(0);
+		beliefKeyframes = new LinkedHashMap<Integer, Agent>();
+		actualKeyframes = new LinkedHashMap<Integer, Agent>();
+
+		lastKeyframe = 0;
+
+		metrics = new MutableMetrics();
+
+		this.pos = init.pos;
+
+		decide.reset();
+
+		beliefKeyframes.put(0, this.copy());
+		actualKeyframes.put(0, this.copy());
+	}
+
 	/**
 	 * Construct an agent at position (x, y) with the given width and height,
 	 * and add it to the environment.
@@ -183,8 +200,8 @@ public class Agent extends DynamicObject {
 		 * If something's happened to the belief state, we fix it.
 		 */
 		if (belief.dirty) {
-			// decide = new DecideByAStarSearch(goal, new
-			// DistanceToGoalHeuristicFunction(env));
+			decide = new DecideByAStarSearch(goal,
+					new DistanceToGoalHeuristicFunction(env));
 			belief.clean();
 		}
 
@@ -206,7 +223,8 @@ public class Agent extends DynamicObject {
 		 * Update belief states based on what we believe will happen
 		 */
 		belief = beliefResult.fst;
-		beliefKeyframes.put(lastKeyframe + 1, beliefResult.fst.agents.get(0));
+		beliefKeyframes.put(lastKeyframe + 1,
+				new Agent(beliefResult.fst.agents.get(0)));
 
 		/*
 		 * Find out what will actually happen
@@ -217,8 +235,8 @@ public class Agent extends DynamicObject {
 		 * Update actual states based on what will actually happen
 		 */
 		env = actualResult.fst;
-		actualKeyframes.put(lastKeyframe + 1, actualResult.fst.agents.get(0)
-				.copy());
+		actualKeyframes.put(lastKeyframe + 1, new Agent(actualResult.fst.agents
+				.get(0).copy()));
 
 		// System.out.println("ACTUAL KEYFRAMES " + actualKeyframes);
 

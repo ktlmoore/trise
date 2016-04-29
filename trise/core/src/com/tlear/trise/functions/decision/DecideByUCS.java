@@ -41,10 +41,15 @@ public class DecideByUCS implements DecisionFunction {
 														// links back from the
 														// goal
 	private List<Node<Vector2>> path = new LinkedList<>();
-	
+
 	private MutableMetrics metrics;
 
 	private boolean initialised;
+
+	@Override
+	public void reset() {
+		initialised = false;
+	}
 
 	public DecideByUCS(GoalFunction goal) {
 		probabilisticRoadMap = new BridsonsPRM(1000, 10);
@@ -55,23 +60,26 @@ public class DecideByUCS implements DecisionFunction {
 		pathBack = new HashMap<Node<Vector2>, Node<Vector2>>();
 		explored = new HashSet<Node<Vector2>>();
 		compare = null;
-		
+
 		metrics = new MutableMetrics();
 	}
 
 	@Override
-	public Tuple<MutableMetrics, Tuple<Action, TrackedGraph<Vector2>>> apply(Environment t) {
+	public Tuple<MutableMetrics, Tuple<Action, TrackedGraph<Vector2>>> apply(
+			Environment t) {
 
 		System.out.println("APPLYING");
 		if (!initialised) {
 			metrics.reset();
 			pathBack = new HashMap<Node<Vector2>, Node<Vector2>>();
 			System.out.println("INITIALISING");
-			
+
 			long startTime = System.currentTimeMillis();
 			prm = probabilisticRoadMap.skeletonise(t);
 			long endTime = System.currentTimeMillis();
-			
+
+			frontier = new PriorityQueue<>(compare);
+
 			metrics.setTimeToSkeletonise(endTime - startTime);
 			initialised = true;
 		}
@@ -81,7 +89,8 @@ public class DecideByUCS implements DecisionFunction {
 				if (compare == null) {
 					compare = new DistanceToGoalComparator<>(t);
 				} else {
-					((DistanceToGoalComparator<Node<Vector2>>) compare).nextGoal();
+					((DistanceToGoalComparator<Node<Vector2>>) compare)
+							.nextGoal();
 				}
 			} else {
 				compare = new DistanceToNearestGoalComparator<>(t);
@@ -98,9 +107,7 @@ public class DecideByUCS implements DecisionFunction {
 
 			int nodesExplored = 0;
 			int nodesInFrontier = 1;
-			
-			
-			
+
 			pathBack.put(startNode, startNode);
 			long startTime = System.currentTimeMillis();
 			while (!frontier.isEmpty() && goalNode == null) {
@@ -132,7 +139,7 @@ public class DecideByUCS implements DecisionFunction {
 			System.out.println("ROUTE FOUND");
 			// Once we have found the goal, we then follow the path back to the
 			// start
-			
+
 			metrics.setNodesExplored(nodesExplored);
 			metrics.setNodesInFrontier(nodesInFrontier);
 			metrics.setTimeToSearch(endTime - startTime);
@@ -155,15 +162,18 @@ public class DecideByUCS implements DecisionFunction {
 			next = new Node<Vector2>(t.agents.getFirst().pos.cpy());
 		}
 
-		Action a = new MoveToAction(t.agents.getFirst().pos.cpy(), next.getValue().cpy());
+		Action a = new MoveToAction(t.agents.getFirst().pos.cpy(), next
+				.getValue().cpy());
 		prm.visit(next);
 		return new Tuple<>(metrics, new Tuple<>(a, prm));
 	}
-	
+
+	@Override
 	public String getName() {
 		return "Uniform Cost Search";
 	}
-	
+
+	@Override
 	public String getS13nName() {
 		return "Bridsons PRM";
 	}

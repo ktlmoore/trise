@@ -23,6 +23,11 @@ public class DecideByDijkstra implements DecisionFunction {
 
 	private boolean initialised;
 
+	@Override
+	public void reset() {
+		initialised = false;
+	}
+
 	public DecideByDijkstra() {
 		skeletonisation = new ProbabilisticRoadMap(200, 5);
 		prm = null;

@@ -157,14 +157,15 @@ public class ProximitySensor extends EnvObject implements Sensor {
 			o.pos.y = 0;
 		}
 
-		Environment newEnv = new Environment();
+		Environment newEnv = new Environment(t);
+		newEnv.obstacles = new LinkedList<>();
 		newEnv.placeObstacle(o);
 
 		return newEnv;
 	}
 
 	private boolean sortXFirst() {
-		if (rotation > 315 && rotation <= 45 || rotation > 135
+		if (rotation > 315 || rotation <= 45 || rotation > 135
 				&& rotation <= 225) {
 			return false;
 		} else if (rotation > 45 && rotation <= 135 || rotation > 225

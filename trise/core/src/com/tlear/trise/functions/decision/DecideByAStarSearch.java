@@ -48,6 +48,11 @@ public class DecideByAStarSearch implements DecisionFunction {
 
 	private S13n map;
 
+	@Override
+	public void reset() {
+		initialised = false;
+	}
+
 	/**
 	 * Constructs an A* Decision Function using a given goal test and h(x).
 	 * 
@@ -101,7 +106,11 @@ public class DecideByAStarSearch implements DecisionFunction {
 			// Assume we are not at the goal
 			atGoal = false;
 
+			frontier = new PriorityQueue<>();
+
 			System.out.println("Skeletonising environment...");
+
+			map = new GridMap(50);
 
 			prm = new TrackedUndirectedGraph<>();
 			// Skeletonise (and timestamp the ends)

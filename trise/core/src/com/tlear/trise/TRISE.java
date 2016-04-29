@@ -26,7 +26,7 @@ public class TRISE extends ApplicationAdapter {
 
 	@Override
 	public void create() {
-		
+
 		d = 0;
 		frames = 1;
 
@@ -57,9 +57,10 @@ public class TRISE extends ApplicationAdapter {
 	}
 
 	private void reset() {
-		sim = new Simulation(this);
-		d = 0;
-		frames = 1;
+		sim.reset();
+		/*
+		 * sim = new Simulation(this); d = 0; frames = 1;
+		 */
 	}
 
 	private void checkForInput() {
@@ -80,7 +81,8 @@ public class TRISE extends ApplicationAdapter {
 		if (Gdx.input.justTouched()) {
 
 			// First get the touch position
-			Vector2 touchPosition = new Vector2(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+			Vector2 touchPosition = new Vector2(Gdx.input.getX(),
+					Gdx.graphics.getHeight() - Gdx.input.getY());
 
 			// Then work out what it was that we just touched
 			EnvObject obj = sim.getObjectContainingPoint(touchPosition);
@@ -88,7 +90,7 @@ public class TRISE extends ApplicationAdapter {
 				System.out.println(obj.toString());
 				sim.selectEnvObject(obj);
 				sim.setInfoText(String.format("%s", obj.toString()));
-				
+
 			}
 		}
 		// Deal with non-edit-mode selected item keypresses
@@ -97,14 +99,13 @@ public class TRISE extends ApplicationAdapter {
 			if (sim.selectedObject instanceof Agent) {
 				if (Gdx.input.isKeyJustPressed(Keys.D)) {
 					((Agent) sim.selectedObject).nextDecisionFunction();
-					sim.setInfoText(String.format("%s", sim.selectedObject.toString()));
+					sim.setInfoText(String.format("%s",
+							sim.selectedObject.toString()));
 				}
 				if (Gdx.input.isKeyJustPressed(Keys.G)) {
 					((Agent) sim.selectedObject).nextSkeletonisationFunction();
-					sim.setInfoText(String.format("%s", sim.selectedObject.toString()));
-				}
-				if (Gdx.input.isKeyJustPressed(Keys.H)) {
-					sim.editHeuristic();
+					sim.setInfoText(String.format("%s",
+							sim.selectedObject.toString()));
 				}
 			}
 		}
@@ -131,22 +132,25 @@ public class TRISE extends ApplicationAdapter {
 			if (sim.selectedObject != null) {
 
 				if (Gdx.input.isTouched()) {
-					Vector2 touchPosition = new Vector2(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+					Vector2 touchPosition = new Vector2(Gdx.input.getX(),
+							Gdx.graphics.getHeight() - Gdx.input.getY());
 
 					if (sim.selectedObject.containsPoint(touchPosition)) {
 
-						sim.selectedObject.pos.x = touchPosition.x - sim.selectedObject.width / 2;
-						sim.selectedObject.pos.y = touchPosition.y - sim.selectedObject.height / 2;
+						sim.selectedObject.pos.x = touchPosition.x
+								- sim.selectedObject.width / 2;
+						sim.selectedObject.pos.y = touchPosition.y
+								- sim.selectedObject.height / 2;
 
 						sim.dirtyEnvironment();
 					}
 				}
 
-				if (Gdx.input.isKeyJustPressed(Keys.DEL) || Gdx.input.isKeyJustPressed(Keys.BACKSPACE)) {
+				if (Gdx.input.isKeyJustPressed(Keys.DEL)
+						|| Gdx.input.isKeyJustPressed(Keys.BACKSPACE)) {
 					sim.deleteObject(sim.selectedObject);
 				}
-				
-				
+
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 package com.tlear.trise.interactions;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.function.Function;
 
@@ -77,11 +78,23 @@ public class SensorManager implements Function<Environment, Environment> {
 		}
 
 		/*
-		 * Otherwise, we'll have to do some complex intersections of the things
-		 * sensors tell us. But we can't do that right now, so just throw a
-		 * hissy fit.
+		 * Otherwise, extract the different types of sensor
 		 */
-		throw new RuntimeException("Sensor was not omniscient!");
+		LinkedList<ProximitySensor> proximitySensors = new LinkedList<>();
+		for (Sensor sensor : sensors) {
+			if (sensor instanceof ProximitySensor) {
+				proximitySensors.add((ProximitySensor) sensor);
+			}
+		}
+
+		/*
+		 * If we have no other sensors, throw a problem
+		 */
+		if (proximitySensors.size() == 0) {
+			throw new RuntimeException("Sensor was not omniscient!");
+		}
+
+		return proximitySensors.getFirst().apply(t);
 	}
 
 	/**

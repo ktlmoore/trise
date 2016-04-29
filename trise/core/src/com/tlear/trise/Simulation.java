@@ -2,6 +2,7 @@ package com.tlear.trise;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
@@ -27,7 +28,9 @@ import com.tlear.trise.utils.Triple;
 public class Simulation {
 
 	private Environment env;
+
 	private Map<Integer, Integer> timeMap;
+	private Agent initAgent;
 	private int prevKeyframe, nextKeyframe;
 	private int time;
 	private TrackedGraph<Vector2> g;
@@ -38,12 +41,32 @@ public class Simulation {
 
 	public EnvObject selectedObject;
 
+	public void reset() {
+		timeMap = new LinkedHashMap<>();
+		timeMap.put(0, 0);
+		prevKeyframe = 0;
+		nextKeyframe = 0;
+		time = 0;
+		env.agents = new LinkedList<>();
+		env.agents.add(new Agent(initAgent));
+		env.dirty();
+		Triple<Integer, Integer, TrackedGraph<Vector2>> next = env
+				.getNextKeyframe(timeMap);
+		timeMap.put(next.fst, next.snd);
+		g = next.thd;
+
+		nextKeyframe++;
+	}
+
 	public Simulation(TRISE parent) {
 		this.parent = parent;
 
 		infoText = "";
 
 		createSim();
+
+		timeMap = new LinkedHashMap<>();
+		timeMap.put(0, 0);
 
 		prevKeyframe = 0;
 		nextKeyframe = 0;
@@ -228,8 +251,10 @@ public class Simulation {
 
 		HashSet<Sensor> sensors = new HashSet<>();
 		sensors.add(new OmniscientSensor());
+		// sensors.add(new ProximitySensor(0, 0, 0, 0));
 
 		Agent a = new Agent(10, 10, 25, 25, env, sensors);
+		initAgent = new Agent(a);
 		env.placeAgent(a);
 
 		// g = new StaticGoal(250, 250, 20, 20);
@@ -244,8 +269,6 @@ public class Simulation {
 		// env.placeGoal(g);
 
 		// System.out.println("Creating sim: " + env);
-		timeMap = new LinkedHashMap<>();
-		timeMap.put(0, 0);
 	}
 
 	public void deleteObject(EnvObject obj) {
@@ -286,13 +309,6 @@ public class Simulation {
 		}
 
 		dirtyEnvironment();
-	}
-
-	public void editHeuristic() {
-		HeuristicTextListener listener = new HeuristicTextListener(
-				env.agents.getFirst());
-		Gdx.input.getTextInput(listener, "Enter new heuristic", "",
-				"Enter function");
 	}
 
 	/**
